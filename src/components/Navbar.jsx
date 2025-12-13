@@ -8,7 +8,7 @@ const Navbar = () => {
     <nav className="w-full h-12 flex flex-row m-2 items-center justify-between px-4 bg-white rounded-md shadow-md">
       <div>
         <img src={logo} alt="logo" className="w-8 h-8 -mt-1 inline mr-2 rounded-md" />
-        <span className="text-xl font-semibold">Marketplace</span>
+        <span className="text-xl font-semibold hidden md:inline">Marketplace</span>
       </div>
       <div className="flex flex-row items-center">
         <FaSearch />
