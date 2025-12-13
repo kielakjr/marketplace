@@ -5,7 +5,7 @@ import logo from '../assets/logoM.png'
 
 const Navbar = () => {
   return (
-    <nav className="w-full h-12 flex flex-row m-2 items-center justify-between px-4 bg-white rounded-md shadow-md">
+    <nav className="h-12 flex flex-row m-2 items-center justify-between px-4 bg-white rounded-md shadow-md py-2">
       <div>
         <img src={logo} alt="logo" className="w-8 h-8 -mt-1 inline mr-2 rounded-md" />
         <span className="text-xl font-semibold hidden md:inline">Marketplace</span>

@@ -67,3 +67,4 @@ const marketplaceItems = Array.from({ length: 120 }, (_, index) => {
 });
 
 export default marketplaceItems;
+export { categories, sellers, locations };
