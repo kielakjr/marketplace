@@ -40,10 +40,12 @@ const filterItems = (items, filters) => {
 };
 
 const Items = ( { filters }) => {
-  return (
-    <div className="overflow-auto overflow-x-hidden w-full grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-4 mx-2">
-      {filterItems(items, filters).map((item) => (
 
+  const filteredItems = filterItems(items, filters);
+
+  return (
+    <div className="overflow-auto overflow-x-hidden w-full grid content-start grid-cols-[repeat(auto-fill,minmax(200px, 1fr))] md:grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4 mx-5">
+      {filteredItems.map((item) => (
         <Item key={item.id} item={item} />
       ))}
     </div>
