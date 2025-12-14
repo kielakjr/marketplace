@@ -39,13 +39,36 @@ const filterItems = (items, filters) => {
   });
 };
 
+const sortItems = (items, sorting) => {
+  if (!sorting) return items;
+
+  const sortedItems = [...items];
+  switch (sorting) {
+    case "Cena: od najniższej":
+      sortedItems.sort((a, b) => a.price - b.price);
+      break;
+    case "Cena: od najwyższej":
+      sortedItems.sort((a, b) => b.price - a.price);
+      break;
+    case "Najnowsze":
+      sortedItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      break;
+    case "Najstarsze":
+      sortedItems.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      break;
+    default:
+      break;
+  }
+  return sortedItems;
+};
+
 const Items = ( { filters }) => {
 
   const filteredItems = filterItems(items, filters);
 
   return (
     <div className="overflow-auto overflow-x-hidden w-full grid content-start grid-cols-[repeat(auto-fill,minmax(200px, 1fr))] md:grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4 mx-5">
-      {filteredItems.map((item) => (
+      {sortItems(filteredItems, filters.Sortowanie?.[0]).map((item) => (
         <Item key={item.id} item={item} />
       ))}
     </div>

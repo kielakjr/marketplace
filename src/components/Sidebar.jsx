@@ -11,10 +11,18 @@ const sections = {
    "Stan": ["Nowy", "Używany"]
 }
 
+const sortingOptions = [
+  "Cena: od najniższej",
+  "Cena: od najwyższej",
+  "Najnowsze",
+  "Najstarsze"
+];
+
 const Sidebar = ( { onSave }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const [filters, setFilters] = useState({});
+  const [sorting, setSorting] = useState(null);
 
   const handleFilterChange = (section, option) => {
     setFilters((prevFilters) => {
@@ -33,8 +41,12 @@ const Sidebar = ( { onSave }) => {
     });
   }
 
+  const handleSortingChange = (option) => {
+    setSorting(option);
+  }
+
   const handleSave = () => {
-    onSave({...filters});
+    onSave({...filters, ...sorting ? { Sortowanie: [sorting] } : {} });
   }
 
   return (
@@ -62,6 +74,19 @@ const Sidebar = ( { onSave }) => {
           </ul>
         </div>
       ))}
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold mb-3">Sortowanie</h2>
+        <ul>
+          {sortingOptions.map((option) => (
+            <li key={option} className="mb-2">
+              <label className="inline-flex items-center">
+                <input checked={sorting === option} type="radio" name="sorting" className="form-radio h-4 w-4 text-blue-700" onChange={() => handleSortingChange(option)} />
+                <span className="ml-2">{option}</span>
+              </label>
+            </li>
+          ))}
+        </ul>
+      </div>
       <button onClick={handleSave} className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">Zastosuj filtry</button>
     </aside>
     }
