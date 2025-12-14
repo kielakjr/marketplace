@@ -1,5 +1,6 @@
 import React from 'react'
 import { categories, sellers, locations } from '../data/items'
+import { useState } from 'react'
 
 const sections = {
   "Kategorie": categories,
@@ -9,7 +10,30 @@ const sections = {
    "Stan": ["Nowy", "Używany"]
 }
 
-const Sidebar = () => {
+const Sidebar = ( { onSave }) => {
+
+  const [filters, setFilters] = useState({});
+
+  const handleFilterChange = (section, option) => {
+    setFilters((prevFilters) => {
+      const sectionFilters = prevFilters[section] || [];
+      if (sectionFilters.includes(option)) {
+        return {
+          ...prevFilters,
+          [section]: sectionFilters.filter((item) => item !== option)
+        };
+      } else {
+        return {
+          ...prevFilters,
+          [section]: [...sectionFilters, option]
+        };
+      }
+    });
+  }
+
+  const handleSave = () => {
+    onSave({...filters});
+  }
 
   return (
     <aside className="w-1/3 h-[90vh] overflow-y-auto md:w-1/4 lg:w-1/5 bg-white rounded-md shadow-md ml-2 p-4 sticky top-11 left-0">
@@ -20,7 +44,7 @@ const Sidebar = () => {
             {options.map((option) => (
               <li key={option} className="mb-2">
                 <label className="inline-flex items-center">
-                  <input type="checkbox" className="form-checkbox h-4 w-4 text-blue-700" />
+                  <input type="checkbox" className="form-checkbox h-4 w-4 text-blue-700" onChange={() => handleFilterChange(sectionTitle, option)} />
                   <span className="ml-2">{option}</span>
                 </label>
               </li>
@@ -28,7 +52,7 @@ const Sidebar = () => {
           </ul>
         </div>
       ))}
-      <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">Zastosuj filtry</button>
+      <button onClick={handleSave} className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">Zastosuj filtry</button>
     </aside>
   )
 }
