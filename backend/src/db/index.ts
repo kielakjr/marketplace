@@ -1,9 +1,11 @@
-import { Sequelize } from 'sequelize';
+import { Sequelize } from 'sequelize-typescript';
 import { env } from '../config/env';
+import { User, Product, Order, OrderItem, Payment, Delivery, Category } from '../models';
 
 const sequelize = new Sequelize(env.DATABASE_URL, {
   dialect: 'postgres',
   logging: console.log,
+  models: [User, Product, Order, OrderItem, Payment, Delivery, Category],
 });
 
 export const connectDB = async () => {
