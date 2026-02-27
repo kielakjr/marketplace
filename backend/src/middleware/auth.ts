@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import { verifyToken, JwtPayload } from "../utils/jwt";
 import { env } from "../config/env";
 
-// Rozszerzamy Request o dane z tokena
 declare global {
   namespace Express {
     interface Request {
