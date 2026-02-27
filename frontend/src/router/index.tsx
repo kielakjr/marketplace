@@ -9,7 +9,9 @@ import ProductDetailPage from '@/pages/ProductDetailPage';
 import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
 import DashboardPage from '@/pages/DashboardPage';
+import MyProductsPage from '@/pages/MyProductsPage';
 import CartPage from '@/pages/CartPage';
+import NotFoundPage from '@/pages/NotFoundPage';
 
 export const router = createBrowserRouter([
   {
@@ -18,17 +20,19 @@ export const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: 'products', element: <ProductsPage /> },
       { path: 'products/:id', element: <ProductDetailPage /> },
+
       {
         element: <ProtectedRoute />,
         children: [
+          { path: 'cart', element: <CartPage /> },
           {
             path: 'dashboard',
             element: <DashboardLayout />,
             children: [
               { index: true, element: <DashboardPage /> },
+              { path: 'my-products', element: <MyProductsPage /> },
             ],
           },
-          { path: 'cart', element: <CartPage /> },
         ],
       },
 
@@ -40,7 +44,7 @@ export const router = createBrowserRouter([
         ],
       },
 
-      { path: '*', element: <div className="flex min-h-[50vh] items-center justify-center text-2xl font-bold text-gray-500">404 - Strona nie znaleziona</div> },
+      { path: '*', element: <NotFoundPage /> },
     ],
   },
 ]);
