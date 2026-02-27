@@ -1,12 +1,27 @@
 import { useParams, Link } from 'react-router';
 import { useProduct } from '@/hooks/useProducts';
+import { useAddToCart } from '@/hooks/useCart';
+import { useAppSelector } from '@/store/hooks';
 import { formatPrice } from '@/utils/formatPrice';
 import Spinner from '@/components/ui/Spinner';
+import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 
 const ProductDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const { data: product, isLoading, isError } = useProduct(id!);
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const addToCart = useAddToCart();
+
+  const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      window.location.href = '/login';
+      return;
+    }
+    if (product) {
+      addToCart.mutate({ product_id: product.id, quantity: 1 });
+    }
+  };
 
   if (isLoading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>;
   if (isError || !product) {
@@ -61,6 +76,16 @@ const ProductDetailPage = () => {
               <p className="mt-2 leading-relaxed text-gray-600">{product.description}</p>
             </div>
           )}
+
+          <Button
+            size="lg"
+            className="w-full"
+            onClick={handleAddToCart}
+            disabled={product.quantity_available === 0 || addToCart.isPending}
+            isLoading={addToCart.isPending}
+          >
+            {product.quantity_available === 0 ? 'Brak w magazynie' : 'Dodaj do koszyka'}
+          </Button>
         </div>
       </div>
     </div>

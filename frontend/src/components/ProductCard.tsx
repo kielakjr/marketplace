@@ -1,5 +1,7 @@
 import { Link } from 'react-router';
 import type { Product } from '@/types/product';
+import { useAddToCart } from '@/hooks/useCart';
+import { useAppSelector } from '@/store/hooks';
 import { formatPrice } from '@/utils/formatPrice';
 
 interface ProductCardProps {
@@ -7,6 +9,16 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const addToCart = useAddToCart();
+
+  const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      window.location.href = '/login';
+      return;
+    }
+    addToCart.mutate({ product_id: product.id, quantity: 1 });
+  };
 
   return (
     <div className="group overflow-hidden rounded-2xl border border-brand-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-brand-400">
@@ -39,6 +51,13 @@ const ProductCard = ({ product }: ProductCardProps) => {
             ? `Dostępnych: ${product.quantity_available}`
             : 'Brak w magazynie'}
         </p>
+        <button
+          onClick={handleAddToCart}
+          disabled={product.quantity_available === 0 || addToCart.isPending}
+          className="mt-3 w-full rounded-lg bg-brand-800 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+        >
+          {addToCart.isPending ? 'Dodawanie...' : 'Dodaj do koszyka'}
+        </button>
       </div>
     </div>
   );

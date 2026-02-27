@@ -2,14 +2,20 @@ import { Link, NavLink } from 'react-router';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { logoutThunk } from '@/store/slices/authSlice';
 import { toggleMobileMenu } from '@/store/slices/uiSlice';
+import { useCartItemCount } from '@/hooks/useCart';
+import { useQueryClient } from '@tanstack/react-query';
+import { cartKeys } from '@/hooks/useCart';
 
 const Navbar = () => {
   const dispatch = useAppDispatch();
+  const queryClient = useQueryClient();
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+  const cartCount = useCartItemCount();
   const { isMobileMenuOpen } = useAppSelector((state) => state.ui);
 
   const handleLogout = async () => {
     await dispatch(logoutThunk());
+    queryClient.removeQueries({ queryKey: cartKeys.all });
   };
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -27,6 +33,17 @@ const Navbar = () => {
         <nav className="hidden items-center gap-6 md:flex">
           <NavLink to="/" end className={linkClass}>Strona główna</NavLink>
           <NavLink to="/products" className={linkClass}>Produkty</NavLink>
+
+          {isAuthenticated && (
+            <NavLink to="/cart" className={linkClass}>
+              Koszyk
+              {cartCount > 0 && (
+                <span className="ml-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-800 px-1 text-xs font-semibold text-white">
+                  {cartCount}
+                </span>
+              )}
+            </NavLink>
+          )}
 
           {isAuthenticated ? (
             <>
@@ -72,6 +89,9 @@ const Navbar = () => {
           <div className="flex flex-col gap-3">
             <NavLink to="/" end className={linkClass}>Strona główna</NavLink>
             <NavLink to="/products" className={linkClass}>Produkty</NavLink>
+            {isAuthenticated && (
+              <NavLink to="/cart" className={linkClass}>Koszyk ({cartCount})</NavLink>
+            )}
             {isAuthenticated ? (
               <>
                 <NavLink to="/dashboard" className={linkClass}>Panel</NavLink>
