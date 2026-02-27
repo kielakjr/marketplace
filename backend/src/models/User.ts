@@ -1,6 +1,7 @@
-import { Table, Column, Model, HasMany, DataType, Default, PrimaryKey } from 'sequelize-typescript';
+import { Table, Column, Model, HasMany, DataType, Default, PrimaryKey, HasOne } from 'sequelize-typescript';
 import { Product } from './Product';
 import { Order } from './Order';
+import { Cart } from './Cart';
 
 @Table({
   tableName: 'users',
@@ -45,4 +46,7 @@ export class User extends Model {
 
   @HasMany(() => Order, 'user_id')
   orders!: Order[];
+
+  @HasOne(() => Cart, "user_id")
+  cart!: Cart;
 }

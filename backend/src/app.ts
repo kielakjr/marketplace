@@ -8,6 +8,7 @@ import { env } from "./config/env";
 import authRoutes from "./routes/auth";
 import userRoutes from "./routes/users";
 import productRoutes from "./routes/products";
+import cartRoutes from "./routes/cart";
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use(express.json());
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/products", productRoutes);
+app.use("/cart", cartRoutes);
 
 const initialize = async () => {
   try {

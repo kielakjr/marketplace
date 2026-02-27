@@ -5,3 +5,5 @@ export * from './OrderItem';
 export * from './Payment';
 export * from './Delivery';
 export * from './Category';
+export * from './Cart';
+export * from './CartItem';

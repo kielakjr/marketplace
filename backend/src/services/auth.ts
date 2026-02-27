@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
-import { User } from "../models";
+import { User, Cart } from "../models";
 import { generateToken } from "../utils/jwt";
+import { createUserSchema } from "../validation/user";
 import { loginSchema, registerSchema } from "../validation/auth";
 
 export class AuthService {
@@ -29,6 +30,8 @@ export class AuthService {
       password_hash,
     });
 
+    await Cart.create({ user_id: user.id });
+
     const token = generateToken({ userId: user.id, role: user.role });
 
     return {
@@ -55,6 +58,11 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(validated.password, user.password_hash);
     if (!isPasswordValid) {
       throw new Error("Invalid email or password");
+    }
+
+    const existingCart = await Cart.findOne({ where: { user_id: user.id } });
+    if (!existingCart) {
+      await Cart.create({ user_id: user.id });
     }
 
     const token = generateToken({ userId: user.id, role: user.role });
