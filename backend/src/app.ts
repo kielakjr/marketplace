@@ -9,6 +9,7 @@ import authRoutes from "./routes/auth";
 import userRoutes from "./routes/users";
 import productRoutes from "./routes/products";
 import cartRoutes from "./routes/cart";
+import categoryRoutes from "./routes/categories"
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/products", productRoutes);
 app.use("/cart", cartRoutes);
+app.use("/categories", categoryRoutes);
 
 const initialize = async () => {
   try {
