@@ -23,3 +23,23 @@ export function useCreateCategory() {
     }
   });
 }
+
+export function useDeleteCategory() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => categoriesApi.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: categoryKeys.all })
+    }
+  });
+}
+
+export function useUpdateCategory() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, name, description}: { id: number, name?: string, description? : string}) => categoriesApi.update(id, name, description),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: categoryKeys.all })
+    }
+  });
+}
