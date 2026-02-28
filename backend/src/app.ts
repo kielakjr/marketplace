@@ -10,6 +10,7 @@ import userRoutes from "./routes/users";
 import productRoutes from "./routes/products";
 import cartRoutes from "./routes/cart";
 import categoryRoutes from "./routes/categories"
+import orderRoutes from "./routes/orders";
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use("/users", userRoutes);
 app.use("/products", productRoutes);
 app.use("/cart", cartRoutes);
 app.use("/categories", categoryRoutes);
+app.use("/orders", orderRoutes);
 
 const initialize = async () => {
   try {
