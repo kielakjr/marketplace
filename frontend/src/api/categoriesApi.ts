@@ -7,4 +7,7 @@ export const categoriesApi = {
 
   getById: (id: number) =>
     api.get<Category>(`/categories/${id}`).then((res) => res.data),
+
+  create: (name: string, desciption?: string) =>
+    api.post<Category>('/categories', {name, desciption}).then((res) => res.data),
 };

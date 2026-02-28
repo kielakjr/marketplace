@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { categoriesApi } from '@/api/categoriesApi';
 
 export const categoryKeys = {
@@ -11,5 +11,15 @@ export function useCategories() {
     queryKey: categoryKeys.all,
     queryFn: categoriesApi.getAll,
     staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function useCreateCategory() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ name, description}: { name: string, description? : string}) => categoriesApi.create(name, description),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: categoryKeys.all })
+    }
   });
 }

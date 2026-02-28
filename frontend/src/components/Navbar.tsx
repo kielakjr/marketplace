@@ -34,6 +34,12 @@ const Navbar = () => {
           <NavLink to="/" end className={linkClass}>Strona główna</NavLink>
           <NavLink to="/products" className={linkClass}>Produkty</NavLink>
 
+          {isAuthenticated && user?.role === "ADMIN" && (
+            <NavLink to="/admin" className={linkClass}>
+              Admin Panel
+            </NavLink>
+          )}
+
           {isAuthenticated && (
             <NavLink to="/cart" className={linkClass}>
               Koszyk

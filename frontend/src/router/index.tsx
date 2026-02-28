@@ -1,6 +1,7 @@
 import { createBrowserRouter } from 'react-router';
 import RootLayout from '@/layouts/RootLayout';
 import AuthLayout from '@/layouts/AuthLayout';
+import AdminPanelLayout from '@/layouts/AdminPanelLayout';
 import DashboardLayout from '@/layouts/DashboardLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import HomePage from '@/pages/HomePage';
@@ -11,6 +12,8 @@ import RegisterPage from '@/pages/RegisterPage';
 import DashboardPage from '@/pages/DashboardPage';
 import MyProductsPage from '@/pages/MyProductsPage';
 import CartPage from '@/pages/CartPage';
+import AdminPanelPage from '@/pages/admin/AdminPanelPage';
+import AdminCategories from '@/pages/admin/AdminCategories';
 import NotFoundPage from '@/pages/NotFoundPage';
 
 export const router = createBrowserRouter([
@@ -43,7 +46,19 @@ export const router = createBrowserRouter([
           { path: 'register', element: <RegisterPage /> },
         ],
       },
-
+      {
+        element: <ProtectedRoute requiredRole="ADMIN" />,
+        children: [
+          {
+            path: 'admin',
+            element: <AdminPanelLayout />,
+            children: [
+              { index: true, element: <AdminPanelPage /> },
+              { path: 'categories', element: <AdminCategories /> },
+            ],
+          },
+        ],
+      },
       { path: '*', element: <NotFoundPage /> },
     ],
   },
