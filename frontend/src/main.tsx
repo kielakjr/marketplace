@@ -19,7 +19,6 @@ const queryClient = new QueryClient({
   },
 })
 
-// Sprawdź auth cookie na starcie aplikacji
 store.dispatch(checkAuth());
 
 createRoot(document.getElementById('root')!).render(

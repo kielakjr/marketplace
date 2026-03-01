@@ -4,6 +4,7 @@ const navItems = [
   { to: '/admin', label: 'Przegląd', end: true },
   { to: '/admin/categories', label: 'Kategorie' },
   { to: '/admin/users', label: 'Użytkownicy' },
+  { to: '/admin/orders', label: 'Zamówienia' },
 ];
 
 export const AdminPanelLayout = () => {

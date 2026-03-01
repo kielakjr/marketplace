@@ -15,6 +15,7 @@ import CartPage from '@/pages/CartPage';
 import AdminPanelPage from '@/pages/admin/AdminPanelPage';
 import AdminCategories from '@/pages/admin/AdminCategories';
 import AdminUsers from '@/pages/admin/AdminUsers';
+import AdminOrders from '@/pages/admin/AdminOrders';
 import NotFoundPage from '@/pages/NotFoundPage';
 import OrdersPage from '@/pages/OrdersPage';
 import OrderDetailPage from '@/pages/OrderDetailPage';
@@ -62,7 +63,8 @@ export const router = createBrowserRouter([
             children: [
               { index: true, element: <AdminPanelPage /> },
               { path: 'categories', element: <AdminCategories /> },
-              { path: 'users', element: <AdminUsers /> }
+              { path: 'users', element: <AdminUsers /> },
+              { path: 'orders', element: <AdminOrders /> },
             ],
           },
         ],

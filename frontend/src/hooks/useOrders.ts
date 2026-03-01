@@ -17,6 +17,16 @@ export function useOrders() {
   });
 }
 
+export function useAdminOrders() {
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+  const isAdmin = user?.role === 'ADMIN';
+  return useQuery({
+    queryKey: [...orderKeys.all, 'admin'] as const,
+    queryFn: ordersApi.getAdminAll,
+    enabled: isAuthenticated && isAdmin,
+  });
+}
+
 export function useOrder(id: string) {
   return useQuery({
     queryKey: orderKeys.detail(id),
