@@ -1,19 +1,11 @@
 import { ProductService } from '../services/product';
 import { Request, Response } from 'express';
 
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 interface ProductCreationAttributes {
   name: string;
   description: string;
   price: number;
+  userId: string;
 }
 
 interface ProductUpdateAttributes {
@@ -40,6 +32,15 @@ export async function getProductById(req: Request<{ id: string }>, res: Response
     res.json(product);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch product' });
+  }
+}
+
+export async function getUserProducts(req: Request<{userId: string}>, res: Response){
+  try {
+    const products = await ProductService.getUserProducts(req.params.userId);
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch products' });
   }
 }
 

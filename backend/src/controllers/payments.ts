@@ -7,7 +7,7 @@ export async function processPayment(req: Request<{ orderId: string }>, res: Res
     const payment = await PaymentService.processPayment(
       req.params.orderId,
       req.user!.userId,
-      req.body.payment_gateway_id
+      undefined
     );
     res.json(payment);
   } catch (error: unknown) {

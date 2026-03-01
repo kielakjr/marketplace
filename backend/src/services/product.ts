@@ -9,6 +9,13 @@ export class ProductService {
     return Product.findByPk(id);
   }
 
+  static async getUserProducts(userId: string) {
+    console.log(userId)
+    return Product.findAll({ where: {
+      user_id: userId
+    }})
+  }
+
   static async createProduct(data: Partial<Product>) {
     return Product.create(data);
   }

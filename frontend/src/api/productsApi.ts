@@ -8,6 +8,9 @@ export const productsApi = {
   getById: (id: string) =>
     api.get<Product>(`/products/${id}`).then((res) => res.data),
 
+  getUserProducts: (userId: string) =>
+    api.get<Product[]>(`/products/user/${userId}`).then((res) => res.data),
+
   create: (data: ProductCreationPayload) =>
     api.post<Product>('/products', data).then((res) => res.data),
 

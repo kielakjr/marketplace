@@ -4,6 +4,7 @@ import type { ProductCreationPayload, ProductUpdatePayload, ProductFilters } fro
 
 export const productKeys = {
   all: ['products'] as const,
+  user: ['user-products'] as const,
   lists: () => [...productKeys.all, 'list'] as const,
   list: (filters?: ProductFilters) => [...productKeys.lists(), filters] as const,
   details: () => [...productKeys.all, 'detail'] as const,
@@ -14,6 +15,13 @@ export function useProducts(filters?: ProductFilters) {
   return useQuery({
     queryKey: productKeys.list(filters),
     queryFn: () => productsApi.getAll(filters),
+  });
+}
+
+export function useUserProducts(userId: string) {
+  return useQuery({
+    queryKey: productKeys.user,
+    queryFn: () => productsApi.getUserProducts(userId),
   });
 }
 

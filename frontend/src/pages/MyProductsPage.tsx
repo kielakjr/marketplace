@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useProducts, useDeleteProduct } from '@/hooks/useProducts';
+import { useUserProducts, useDeleteProduct } from '@/hooks/useProducts';
 import { useAppSelector } from '@/store/hooks';
 import { formatPrice } from '@/utils/formatPrice';
 import Button from '@/components/ui/Button';
@@ -12,14 +12,13 @@ import type { Product } from '@/types/product';
 
 const MyProductsPage = () => {
   const { user } = useAppSelector((state) => state.auth);
-  const { data: products, isLoading } = useProducts();
+  const { data: myProducts, isLoading } = useUserProducts(user!.id);
   const deleteProduct = useDeleteProduct();
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const myProducts = products?.filter((p) => p.user_id === user?.id) ?? [];
 
   const handleEdit = (product: Product) => {
     setEditingProduct(product);
@@ -66,7 +65,7 @@ const MyProductsPage = () => {
         </Button>
       </div>
 
-      {myProducts.length === 0 ? (
+      {myProducts?.length === 0 ? (
         <Card className="py-12 text-center">
           <svg className="mx-auto h-16 w-16 text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -76,7 +75,7 @@ const MyProductsPage = () => {
         </Card>
       ) : (
         <div className="space-y-4">
-          {myProducts.map((product) => (
+          {myProducts?.map((product) => (
             <Card key={product.id} className="flex flex-col gap-4 sm:flex-row sm:items-center">
               <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-cream-50">
                 {product.image_url ? (
