@@ -16,6 +16,9 @@ import AdminPanelPage from '@/pages/admin/AdminPanelPage';
 import AdminCategories from '@/pages/admin/AdminCategories';
 import AdminUsers from '@/pages/admin/AdminUsers';
 import NotFoundPage from '@/pages/NotFoundPage';
+import OrdersPage from '@/pages/OrdersPage';
+import OrderDetailPage from '@/pages/OrderDetailPage';
+import CheckoutPage from '@/pages/CheckoutPage';
 
 export const router = createBrowserRouter([
   {
@@ -29,12 +32,15 @@ export const router = createBrowserRouter([
         element: <ProtectedRoute />,
         children: [
           { path: 'cart', element: <CartPage /> },
+          { path: 'checkout', element: <CheckoutPage /> },
           {
             path: 'dashboard',
             element: <DashboardLayout />,
             children: [
               { index: true, element: <DashboardPage /> },
               { path: 'my-products', element: <MyProductsPage /> },
+              { path: 'orders', element: <OrdersPage /> },
+              { path: 'orders/:id', element: <OrderDetailPage />}
             ],
           },
         ],

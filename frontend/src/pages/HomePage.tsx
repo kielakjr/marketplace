@@ -9,7 +9,7 @@ const HomePage = () => {
 
   return (
     <div className="space-y-12">
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-800 via-brand-700 to-brand-500 px-8 py-20 text-center text-white">
+      <section className="relative overflow-hidden rounded-3xl bg-linear-to-br from-brand-800 via-brand-700 to-brand-500 px-8 py-20 text-center text-white">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-brand-400" />
           <div className="absolute -bottom-16 -left-16 h-72 w-72 rounded-full bg-brand-400" />
