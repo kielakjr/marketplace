@@ -12,6 +12,7 @@ import cartRoutes from "./routes/cart";
 import categoryRoutes from "./routes/categories";
 import orderRoutes from "./routes/orders";
 import deliveryRoutes from "./routes/deliveries";
+import paymentRoutes from "./routes/payments";
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use("/cart", cartRoutes);
 app.use("/categories", categoryRoutes);
 app.use("/orders", orderRoutes);
 app.use("/deliveries", deliveryRoutes);
+app.use("/payments", paymentRoutes);
 
 const initialize = async () => {
   try {
