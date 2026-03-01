@@ -12,7 +12,7 @@ const AdminUsers = () => {
       <h1>Users</h1>
       <ul>
         {users?.map(user => (
-          <UserCard user={user} onChangeRole={() => {}} onEdit={() => {}} onDelete={() => {}}/>
+          <UserCard key={user.id} user={user} onChangeRole={() => {}} onEdit={() => {}} onDelete={() => {}}/>
         ))}
       </ul>
     </div>
