@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { AuthService } from "../services/auth";
 import { setTokenCookie, clearTokenCookie } from "../utils/cookie";
+import { ZodError } from "zod";
 
 export async function registerUser(req: Request, res: Response) {
   try {
@@ -10,6 +11,9 @@ export async function registerUser(req: Request, res: Response) {
 
     res.status(201).json({ user });
   } catch (error: unknown) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({ error: error.issues });
+    }
     if (error instanceof Error) {
       if (error.message.includes("already")) {
         return res.status(409).json({ error: error.message });

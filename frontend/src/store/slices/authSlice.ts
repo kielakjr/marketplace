@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { usersApi } from '@/api/usersApi';
 import type { User, LoginPayload, RegisterPayload } from '@/types/user';
+import axios from 'axios';
 
 interface AuthState {
   user: User | null;
@@ -40,14 +41,51 @@ export const login = createAsyncThunk(
   }
 );
 
-export const register = createAsyncThunk(
+type RegisterError = {
+  error: {
+    code: string;
+    message: string;
+    path: string[];
+  }[];
+};
+
+export const register = createAsyncThunk<
+  User,
+  RegisterPayload,
+  { rejectValue: RegisterError }
+>(
   'auth/register',
-  async (payload: RegisterPayload, { rejectWithValue }) => {
+  async (payload, { rejectWithValue }) => {
     try {
       const { user } = await usersApi.register(payload);
       return user;
-    } catch {
-      return rejectWithValue('Registration failed');
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        const backendErrors = err.response?.data?.error;
+
+        if (Array.isArray(backendErrors)) {
+          return rejectWithValue({ error: backendErrors });
+        }
+        return rejectWithValue({
+          error: [
+            {
+              code: 'unknown',
+              message: typeof backendErrors === 'string' ? backendErrors : 'Unknown error',
+              path: ['general'],
+            },
+          ],
+        });
+      }
+
+      return rejectWithValue({
+        error: [
+          {
+            code: 'unknown',
+            message: 'Unexpected error',
+            path: ['general'],
+          },
+        ],
+      });
     }
   }
 );
