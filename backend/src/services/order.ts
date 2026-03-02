@@ -1,8 +1,17 @@
 import sequelize from "../db";
-import { Order, OrderItem, Product, Payment, Delivery, User, CartItem, Cart } from "../models";
+import { Order, OrderItem, Product, Payment, Delivery, User, CartItem, Cart, Address } from "../models";
 
 export class OrderService {
-  static async createOrder(userId: string, items: { product_id: string; quantity: number }[], addressDetails: string) {
+  static async createOrder(
+    userId: string,
+    items: { product_id: string; quantity: number }[],
+    address: {
+      street: string;
+      street_number: string;
+      city: string;
+      postal_code: string;
+    }
+  ) {
     const transaction = await sequelize.transaction();
 
     try {
@@ -32,6 +41,16 @@ export class OrderService {
         { transaction }
       );
 
+      const addressModel = await Address.create(
+        {
+          street: address.street,
+          street_number: address.street_number,
+          city: address.city,
+          postal_code: address.postal_code,
+        },
+        { transaction }
+      );
+
       for (const item of orderItemsData) {
         await OrderItem.create(
           { order_id: order.id, ...item },
@@ -50,7 +69,7 @@ export class OrderService {
       );
 
       await Delivery.create(
-        { order_id: order.id, address_details: addressDetails, status: "PREPARING" },
+        { order_id: order.id, address_id: addressModel.id, status: "PREPARING" },
         { transaction }
       );
 

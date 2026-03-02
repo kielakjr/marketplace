@@ -9,7 +9,12 @@ export const createOrderSchema = z.object({
       })
     )
     .min(1, "Order must contain at least one item"),
-  address_details: z.string().min(5, "Address must be at least 5 characters"),
+  address: z.object({
+    street: z.string().min(1, "Street is required"),
+    street_number: z.string().min(1, "Street number is required"),
+    city: z.string().min(1, "City is required"),
+    postal_code: z.string().min(1, "Postal code is required"),
+  }),
 });
 
 export const updateOrderStatusSchema = z.object({

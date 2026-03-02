@@ -22,7 +22,12 @@ export interface OrderDelivery {
   id: string;
   tracking_number?: string;
   status: 'PREPARING' | 'SHIPPED' | 'IN_TRANSIT' | 'DELIVERED' | 'FAILED_DELIVERY';
-  address_details: string;
+  address: {
+    street: string;
+    street_number: string;
+    city: string;
+    postal_code: string;
+  };
 }
 
 export interface Order {
@@ -39,5 +44,10 @@ export interface Order {
 
 export interface CreateOrderPayload {
   items: Array<{ product_id: string; quantity: number }>;
-  address_details: string;
+  address: {
+    street: string;
+    street_number: string;
+    city: string;
+    postal_code: string;
+  }
 }

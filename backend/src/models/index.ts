@@ -7,3 +7,4 @@ export * from './Delivery';
 export * from './Category';
 export * from './Cart';
 export * from './CartItem';
+export * from './Address';

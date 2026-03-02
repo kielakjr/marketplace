@@ -38,7 +38,7 @@ app.use("/payments", paymentRoutes);
 
 const initialize = async () => {
   try {
-    await sequelize.sync();
+    await sequelize.sync({alter: true});
     console.log("Database initialized successfully.");
   } catch (error) {
     console.error("Failed to initialize database:", error);

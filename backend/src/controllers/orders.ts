@@ -5,7 +5,7 @@ import { createOrderSchema, updateOrderStatusSchema } from "../validation/order"
 export async function createOrder(req: Request, res: Response) {
   try {
     const validated = createOrderSchema.parse(req.body);
-    const order = await OrderService.createOrder(req.user!.userId, validated.items, validated.address_details);
+    const order = await OrderService.createOrder(req.user!.userId, validated.items, validated.address);
     res.status(201).json(order);
   } catch (error: unknown) {
     if (error instanceof Error) {

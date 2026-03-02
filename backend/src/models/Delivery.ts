@@ -1,5 +1,6 @@
- import { Table, Column, Model, ForeignKey, BelongsTo, DataType, Default, PrimaryKey } from 'sequelize-typescript';
+import { Table, Column, Model, ForeignKey, BelongsTo, DataType, Default, PrimaryKey } from 'sequelize-typescript';
 import { Order } from './Order';
+import { Address } from './Address';
 
 @Table({
   tableName: 'deliveries',
@@ -24,16 +25,17 @@ export class Delivery extends Model {
   })
   status!: 'PREPARING' | 'SHIPPED' | 'IN_TRANSIT' | 'DELIVERED' | 'FAILED_DELIVERY';
 
-  @Column({
-    type: DataType.TEXT,
-    allowNull: false,
-  })
-  address_details!: string;
-
   @ForeignKey(() => Order)
   @Column(DataType.UUID)
   order_id!: string;
 
   @BelongsTo(() => Order, 'order_id')
   order!: Order;
+
+  @ForeignKey(() => Address)
+  @Column(DataType.UUID)
+  address_id!: string;
+
+  @BelongsTo(() => Address, 'address_id')
+  address!: Address;
 }

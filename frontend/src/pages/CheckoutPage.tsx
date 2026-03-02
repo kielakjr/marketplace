@@ -1,14 +1,16 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router';
+import { useQueryClient } from '@tanstack/react-query';
+
 import { useCart, useCartTotal } from '@/hooks/useCart';
 import { useCreateOrder } from '@/hooks/useOrders';
 import { cartKeys } from '@/hooks/useCart';
-import { useQueryClient } from '@tanstack/react-query';
 import { formatPrice } from '@/utils/formatPrice';
+
 import Spinner from '@/components/ui/Spinner';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
-import Textarea from '@/components/ui/Textarea';
+import Input from '@/components/ui/Input';
 
 const CheckoutPage = () => {
   const { data: cart, isLoading } = useCart();
@@ -17,7 +19,10 @@ const CheckoutPage = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const [address, setAddress] = useState('');
+  const [street, setStreet] = useState('');
+  const [streetNumber, setStreetNumber] = useState('');
+  const [city, setCity] = useState('');
+  const [postalCode, setPostalCode] = useState('');
   const [error, setError] = useState('');
 
   const items = cart?.items ?? [];
@@ -26,11 +31,15 @@ const CheckoutPage = () => {
     e.preventDefault();
     setError('');
 
-    if (!address.trim() || address.trim().length < 5) {
-      setError('Podaj pełny adres dostawy (min. 5 znaków)');
+    if (!street.trim() || !streetNumber.trim() || !city.trim() || !postalCode.trim()) {
+      setError('Wszystkie pola adresu są wymagane.');
       return;
     }
-    if (items.length === 0) return;
+
+    if (items.length === 0) {
+      setError('Twój koszyk jest pusty.');
+      return;
+    }
 
     try {
       const orderItems = items.map((item) => ({
@@ -40,74 +49,133 @@ const CheckoutPage = () => {
 
       await createOrder.mutateAsync({
         items: orderItems,
-        address_details: address.trim(),
+        address: {
+          street: street.trim(),
+          street_number: streetNumber.trim(),
+          city: city.trim(),
+          postal_code: postalCode.trim(),
+        },
       });
 
-      queryClient.invalidateQueries({ queryKey: cartKeys.all });
+      await queryClient.invalidateQueries({ queryKey: cartKeys.all });
       navigate('/dashboard/orders', { replace: true });
-    } catch {
+    } catch (err) {
       setError('Nie udało się złożyć zamówienia. Spróbuj ponownie.');
     }
   };
 
-  if (isLoading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>;
-
-  if (items.length === 0) {
+  if (isLoading) {
     return (
-      <div className="mx-auto max-w-2xl text-center py-20">
-        <p className="text-gray-500">Twój koszyk jest pusty.</p>
+      <div className="flex h-64 items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  if (!cart || items.length === 0) {
+    return (
+      <div className="py-20 text-center">
+        <h1 className="text-2xl font-bold text-brand-800">Twój koszyk jest pusty</h1>
+        <p className="mt-2 text-gray-500">Dodaj produkty do koszyka, aby móc złożyć zamówienie.</p>
+        <Button onClick={() => navigate('/')} className="mt-6">
+          Wróć do sklepu
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <h1 className="text-3xl font-bold text-brand-800">Złóż zamówienie</h1>
+    <div className="container mx-auto max-w-6xl px-4 py-12">
+      <h1 className="mb-8 text-center text-4xl font-extrabold tracking-tight text-brand-800">
+        Podsumowanie zamówienia
+      </h1>
 
-      <Card>
-        <h2 className="text-lg font-semibold text-brand-800">Produkty</h2>
-        <div className="mt-4 space-y-3">
-          {items.map((item) => (
-            <div key={item.id} className="flex justify-between text-sm">
-              <span className="text-gray-700">
-                {item.product?.name} × {item.quantity}
-              </span>
-              <span className="font-medium text-gray-900">
-                {formatPrice((item.product?.price ?? 0) * item.quantity)}
-              </span>
+      <div className="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-8">
+        <div className="order-last md:order-first">
+          <Card className="bg-white shadow-lg">
+            <h2 className="text-2xl font-bold text-brand-800">Twoje produkty</h2>
+            <div className="mt-6 space-y-4">
+              {items.map((item) => (
+                <div key={item.id} className="flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold text-gray-800">{item.product?.name}</p>
+                    <p className="text-sm text-gray-500">Ilość: {item.quantity}</p>
+                  </div>
+                  <span className="font-medium text-gray-900">
+                    {formatPrice((item.product?.price ?? 0) * item.quantity)}
+                  </span>
+                </div>
+              ))}
             </div>
-          ))}
-          <hr className="border-brand-200" />
-          <div className="flex justify-between text-lg font-bold text-brand-800">
-            <span>Razem</span>
-            <span>{formatPrice(cartTotal)}</span>
-          </div>
+            <hr className="my-6 border-brand-200" />
+            <div className="flex justify-between text-xl font-bold text-brand-800">
+              <span>Łącznie</span>
+              <span>{formatPrice(cartTotal)}</span>
+            </div>
+          </Card>
         </div>
-      </Card>
 
-      <Card>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <h2 className="text-lg font-semibold text-brand-800">Adres dostawy</h2>
+        <div>
+          <Card className="bg-white shadow-lg">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <h2 className="text-2xl font-bold text-brand-800">Adres dostawy</h2>
 
-          {error && (
-            <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</div>
-          )}
+              {error && (
+                <div className="rounded-lg bg-red-100 p-4 text-sm font-medium text-red-700">
+                  {error}
+                </div>
+              )}
 
-          <Textarea
-            id="address"
-            label="Pełny adres"
-            placeholder="ul. Przykładowa 1, 00-001 Warszawa"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            required
-            rows={3}
-          />
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                  <Input
+                    type="text"
+                    placeholder="Ulica"
+                    value={street}
+                    onChange={(e) => setStreet(e.target.value)}
+                    required
+                    className="sm:col-span-2"
+                  />
+                  <Input
+                    type="text"
+                    placeholder="Nr"
+                    value={streetNumber}
+                    onChange={(e) => setStreetNumber(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                   <Input
+                    type="text"
+                    placeholder="Kod pocztowy"
+                    value={postalCode}
+                    onChange={(e) => setPostalCode(e.target.value)}
+                    required
+                  />
+                  <Input
+                    type="text"
+                    placeholder="Miasto"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    required
+                    className="sm:col-span-2"
+                  />
+                </div>
+              </div>
 
-          <Button type="submit" className="w-full" size="lg" isLoading={createOrder.isPending}>
-            Złóż zamówienie — {formatPrice(cartTotal)}
-          </Button>
-        </form>
-      </Card>
+              <Button
+                type="submit"
+                className="w-full"
+                size="lg"
+                isLoading={createOrder.isPending}
+                disabled={items.length === 0}
+              >
+                {createOrder.isPending ? 'Składanie zamówienia...' : `Zapłać i zamów — ${formatPrice(cartTotal)}`}
+              </Button>
+            </form>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };

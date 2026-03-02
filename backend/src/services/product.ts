@@ -1,8 +1,13 @@
 import { Product } from '../models';
+import { Op } from 'sequelize';
 
 export class ProductService {
   static async getAllProducts() {
-    return Product.findAll();
+    return Product.findAll({
+      where: {
+        quantity_available: { [Op.gt]: 0 },
+      }
+    });
   }
 
   static async getProductById(id: string) {
