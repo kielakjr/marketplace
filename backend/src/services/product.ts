@@ -1,6 +1,6 @@
-import { Product } from '../models';
+import { Product, User, Category } from '../models';
 import { Op } from 'sequelize';
-import { ProductFilters } from '../dto/products';
+import { ProductFilters, ProductDTO } from '../dto/products';
 
 export class ProductService {
   static async getProducts(filters?: Partial<ProductFilters>) {
@@ -32,12 +32,17 @@ export class ProductService {
 
   }
 
-  static async getProductById(id: string) {
-    return Product.findByPk(id);
+  static async getProductById(id: string): Promise<ProductDTO | null> {
+    return await Product.findOne({
+      where: { id },
+      include: [
+        { model: User, as: "seller", attributes: ['id', 'username', 'email'] },
+        { model: Category, as: "category" }
+      ]
+      }) as ProductDTO | null;
   }
 
   static async getUserProducts(userId: string) {
-    console.log(userId)
     return Product.findAll({ where: {
       user_id: userId
     }})

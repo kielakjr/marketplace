@@ -11,6 +11,20 @@ export interface Product {
   updatedAt: string;
 }
 
+
+export interface ProductWithCategoryAndSeller extends Product {
+  category: {
+    id: number;
+    name: string;
+    description?: string;
+  };
+  seller: {
+    id: string;
+    username: string;
+    email: string;
+  };
+}
+
 export interface ProductCreationPayload {
   name: string;
   image_url?: string;
