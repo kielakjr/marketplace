@@ -155,7 +155,7 @@ const ProductDetailPage = () => {
           <div>
             <h2 className="text-xl font-semibold text-brand-800">Masz pytanie o produkt?</h2>
             <p className="mt-2 text-sm text-gray-600">
-              Skontaktuj się z naszym wsparciem – odpowiemy najszybciej jak to możliwe.
+              Skontaktuj się z naszym wsparciem - odpowiemy najszybciej jak to możliwe.
             </p>
           </div>
           <Link

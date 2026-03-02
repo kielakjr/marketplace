@@ -31,12 +31,15 @@ const OrdersPage = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-brand-800">Moje zamówienia</h1>
+      <div>
+        <h1 className="text-2xl font-bold text-brand-800">Moje zamówienia</h1>
+        <p className="mt-1 text-sm text-gray-600">Śledź statusy i podsumowania swoich zakupów.</p>
+      </div>
 
       <div className="space-y-4">
         {orders.map((order) => (
           <Link key={order.id} to={`/dashboard/orders/${order.id}`}>
-            <Card className="flex flex-col gap-4 transition-all hover:shadow-md hover:border-brand-400 sm:flex-row sm:items-center mb-4">
+            <Card className="flex flex-col gap-4 transition-all hover:shadow-md hover:border-brand-400 sm:flex-row sm:items-center">
               <div className="flex-1">
                 <p className="text-xs text-gray-500">
                   {new Date(order.createdAt).toLocaleDateString('pl-PL', {

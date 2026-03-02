@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useUserProducts, useDeleteProduct } from '@/hooks/useProducts';
 import { useAppSelector } from '@/store/hooks';
 import { formatPrice } from '@/utils/formatPrice';
@@ -18,7 +18,23 @@ const MyProductsPage = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
+  const [stockFilter, setStockFilter] = useState<'all' | 'in' | 'out'>('all');
 
+  const filteredProducts = useMemo(() => {
+    if (!myProducts) return [];
+    const lower = query.toLowerCase();
+    return myProducts.filter((product) => {
+      const matchesQuery = [product.name, product.description ?? '']
+        .some((value) => value.toLowerCase().includes(lower));
+      const matchesStock =
+        stockFilter === 'all' ||
+        (stockFilter === 'in' && product.quantity_available > 0) ||
+        (stockFilter === 'out' && product.quantity_available === 0);
+
+      return matchesQuery && matchesStock;
+    });
+  }, [myProducts, query, stockFilter]);
 
   const handleEdit = (product: Product) => {
     setEditingProduct(product);
@@ -55,17 +71,48 @@ const MyProductsPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-brand-800">Moje produkty</h1>
+      <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-brand-800">Moje produkty</h1>
+          <p className="mt-1 text-sm text-gray-600">Dodawaj, edytuj i kontroluj dostępność swoich ofert.</p>
+        </div>
         <Button onClick={handleAdd}>
           <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
           Dodaj produkt
         </Button>
+      </header>
+
+      <div className="flex flex-col gap-3 rounded-2xl border border-brand-100 bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Szukaj po nazwie lub opisie..."
+          className="w-full rounded-xl border border-brand-200 bg-white px-4 py-2 text-sm text-brand-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-400/40 md:max-w-md"
+        />
+        <div className="flex gap-2">
+          {[
+            { value: 'all', label: 'Wszystkie' },
+            { value: 'in', label: 'Dostępne' },
+            { value: 'out', label: 'Brak w magazynie' },
+          ].map((filter) => (
+            <button
+              key={filter.value}
+              onClick={() => setStockFilter(filter.value as 'all' | 'in' | 'out')}
+              className={`rounded-xl px-4 py-2 text-xs font-semibold transition ${
+                stockFilter === filter.value
+                  ? 'bg-brand-800 text-white'
+                  : 'bg-cream-100 text-brand-800 hover:bg-cream-200'
+              }`}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {myProducts?.length === 0 ? (
+      {filteredProducts.length === 0 ? (
         <Card className="py-12 text-center">
           <svg className="mx-auto h-16 w-16 text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -75,7 +122,7 @@ const MyProductsPage = () => {
         </Card>
       ) : (
         <div className="space-y-4">
-          {myProducts?.map((product) => (
+          {filteredProducts.map((product) => (
             <Card key={product.id} className="flex flex-col gap-4 sm:flex-row sm:items-center">
               <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-cream-50">
                 {product.image_url ? (
