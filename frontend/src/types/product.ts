@@ -30,10 +30,12 @@ export interface ProductUpdatePayload {
 }
 
 export interface ProductFilters {
-  category_id?: number;
+  categoryId?: number;
   minPrice?: number;
   maxPrice?: number;
-  search?: string;
+  name?: string;
   page?: number;
   limit?: number;
+  sortBy?: 'price' | 'createdAt';
+  sortOrder?: 'asc' | 'desc';
 }

@@ -90,8 +90,8 @@ const CheckoutPage = () => {
         Podsumowanie zamówienia
       </h1>
 
-      <div className="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-8">
-        <div className="order-last md:order-first">
+      <div className="flex flex-col gap-8">
+        <div className="">
           <Card className="bg-white shadow-lg">
             <h2 className="text-2xl font-bold text-brand-800">Twoje produkty</h2>
             <div className="mt-6 space-y-4">

@@ -27,7 +27,7 @@ export class Address extends Model {
 
   @Column({
     type: DataType.STRING(20),
-    allowNull: false,
+    allowNull: true,
   })
   street_number!: string;
 

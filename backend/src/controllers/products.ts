@@ -1,5 +1,6 @@
 import { ProductService } from '../services/product';
 import { Request, Response } from 'express';
+import { ProductFilters } from '../dto/products';
 
 interface ProductCreationAttributes {
   name: string;
@@ -14,9 +15,17 @@ interface ProductUpdateAttributes {
   price?: number;
 }
 
-export async function getProducts(req: Request, res: Response) {
+export async function getProducts(req: Request<{}, {}, {}, ProductFilters>, res: Response) {
   try {
-    const products = await ProductService.getAllProducts();
+    const filters: ProductFilters = {};
+    if (req.query.name) filters.name = req.query.name as string;
+    if (req.query.categoryId) filters.categoryId = parseInt(req.query.categoryId as unknown as string);
+    if (req.query.minPrice) filters.minPrice = parseFloat(req.query.minPrice as unknown as string);
+    if (req.query.maxPrice) filters.maxPrice = parseFloat(req.query.maxPrice as unknown as string);
+    if (req.query.sortBy) filters.sortBy = req.query.sortBy as 'price' | 'createdAt';
+    if (req.query.sortOrder) filters.sortOrder = req.query.sortOrder as 'asc' | 'desc';
+
+    const products = await ProductService.getProducts(filters);
     res.json(products);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch products' });

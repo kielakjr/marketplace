@@ -105,7 +105,7 @@ export class OrderService {
       include: [
         { model: Product, through: { attributes: ["quantity", "price_per_unit"] } },
         { model: Payment, as: "payment" },
-        { model: Delivery, as: "delivery" },
+        { model: Delivery, as: "delivery", include: [{ model: Address, as: "address" }] },
       ],
     });
     if (!order) throw new Error("Order not found");

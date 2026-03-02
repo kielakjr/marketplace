@@ -118,7 +118,7 @@ const OrderDetailPage = () => {
               )}
               <div className="flex justify-between">
                 <span className="text-gray-500">Adres</span>
-                <span className="text-right max-w-50">{order.delivery.address_details}</span>
+                <span className="text-right max-w-50">{order.delivery.address.street} {order.delivery.address.street_number}, {order.delivery.address.postal_code} {order.delivery.address.city}</span>
               </div>
             </div>
           </Card>

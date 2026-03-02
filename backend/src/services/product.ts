@@ -1,13 +1,35 @@
 import { Product } from '../models';
 import { Op } from 'sequelize';
+import { ProductFilters } from '../dto/products';
 
 export class ProductService {
-  static async getAllProducts() {
-    return Product.findAll({
-      where: {
-        quantity_available: { [Op.gt]: 0 },
-      }
-    });
+  static async getProducts(filters?: Partial<ProductFilters>) {
+    const where: any = {
+      quantity_available: { [Op.gt]: 0 },
+    };
+
+    if (filters?.name) {
+      where.name = { [Op.like]: `%${filters.name}%` };
+    }
+
+    if (filters?.categoryId) {
+      where.category_id = filters.categoryId;
+    }
+
+    if (filters?.minPrice && !filters?.maxPrice) {
+      where.price = { [Op.gte]: filters.minPrice };
+    } else if (!filters?.minPrice && filters?.maxPrice) {
+      where.price = { [Op.lte]: filters.maxPrice };
+    } else if (filters?.minPrice && filters?.maxPrice) {
+      where.price = { [Op.between]: [filters.minPrice, filters.maxPrice] };
+    }
+
+    if (filters?.sortBy && filters?.sortOrder) {
+      return Product.findAll({ where, order: [[filters.sortBy, filters.sortOrder]] });
+    }
+
+    return Product.findAll({ where });
+
   }
 
   static async getProductById(id: string) {
