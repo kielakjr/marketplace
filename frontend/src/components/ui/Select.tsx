@@ -4,7 +4,7 @@ import { cn } from '@/utils/cn';
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   error?: string;
-  options: { value: string | number; label: string }[];
+  options: { value: string | number | undefined; label: string }[];
   placeholder?: string;
 }
 
@@ -33,7 +33,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             </option>
           )}
           {options.map((opt) => (
-            <option key={opt.value} value={opt.value}>
+            <option key={opt.value || opt.label} value={opt.value}>
               {opt.label}
             </option>
           ))}
