@@ -17,7 +17,6 @@ const AdminPanelPage = () => {
   const { data: orders, isLoading: ordersLoading, error } = useAdminOrders();
   const usersCount = usersData?.pagination.total ?? 0;
 
-  console.log('AdminPanelPage render - users count:', usersData);
   const isLoading = productsLoading || categoriesLoading || usersLoading || ordersLoading;
 
   const products = productsData?.data || [];

@@ -1,4 +1,4 @@
-import { useActionState } from 'react';
+import { useActionState, useRef } from 'react';
 import { useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -17,6 +17,7 @@ const CheckoutPage = () => {
   const createOrder = useCreateOrder();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const formRef = useRef<HTMLFormElement>(null);
 
   const items = cart?.items ?? [];
 
@@ -97,7 +98,7 @@ const CheckoutPage = () => {
               <h2 className="mt-1 text-2xl font-bold text-white">Adres dostawy</h2>
             </div>
 
-            <form action={formAction} className="p-6">
+            <form ref={formRef} action={formAction} className="p-6">
               {error && (
                 <div className="mb-5 flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
                   <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -120,7 +121,7 @@ const CheckoutPage = () => {
 
               <dl className="mt-6 divide-y divide-brand-50 rounded-xl border border-brand-100 bg-cream-50">
                 {[
-                  { label: 'Czas dostawy', value: '24–48 h' },
+                  { label: 'Czas dostawy', value: '24-48 h' },
                   { label: 'Kurier', value: 'DPD / InPost' },
                   { label: 'Zwrot', value: '14 dni' },
                 ].map(({ label, value }) => (
@@ -170,7 +171,7 @@ const CheckoutPage = () => {
                     <div className="min-w-0">
                       <p className="truncate font-semibold text-brand-800">{item.product?.name}</p>
                       <p className="mt-0.5 text-sm text-gray-500">
-                        {item.quantity} szt. × {formatPrice(item.product?.price ?? 0)}
+                        {item.quantity} szt. x {formatPrice(item.product?.price ?? 0)}
                       </p>
                     </div>
                     <span className="shrink-0 font-semibold text-brand-800">
@@ -202,14 +203,14 @@ const CheckoutPage = () => {
                 </span>
               </div>
 
-              <label htmlFor="checkout-submit" className="mt-5 block">
+              <label className="mt-5 block">
                 <Button
                   type="button"
                   className="w-full"
                   size="lg"
                   isLoading={isPending}
                   disabled={items.length === 0 || isPending}
-                  onClick={() => document.getElementById('checkout-submit')?.click()}
+                  onClick={() => formRef.current?.requestSubmit()}
                 >
                   {isPending ? (
                     'Składanie zamówienia...'
