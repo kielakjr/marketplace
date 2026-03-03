@@ -11,6 +11,9 @@ export const ordersApi = {
   getById: (id: string) =>
     api.get<Order>(`/orders/${id}`).then((res) => res.data),
 
+  getSellersOrders: (sellerId: string) =>
+    api.get<Order[]>(`/orders/seller/${sellerId}`).then((res) => res.data),
+
   create: (data: CreateOrderPayload) =>
     api.post<Order>('/orders', data).then((res) => res.data),
 

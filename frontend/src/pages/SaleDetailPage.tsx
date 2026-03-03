@@ -6,7 +6,7 @@ import Spinner from '@/components/ui/Spinner';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 
-const OrderDetailPage = () => {
+const SaleDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const { data: order, isLoading, isError } = useOrder(id!);
   const cancelOrder = useCancelOrder();
@@ -53,8 +53,8 @@ const OrderDetailPage = () => {
   return (
     <div className="space-y-8">
       <nav className="flex items-center gap-2 text-sm">
-        <Link to="/dashboard/orders" className="font-medium text-brand-500 transition hover:text-brand-800">
-          Zamówienia
+        <Link to="/dashboard/sales" className="font-medium text-brand-500 transition hover:text-brand-800">
+          Sprzedaż
         </Link>
         <span className="text-brand-300">/</span>
         <span className="font-mono text-xs text-brand-800">{order.id}</span>
@@ -62,9 +62,9 @@ const OrderDetailPage = () => {
 
       <div className="overflow-hidden rounded-3xl border border-brand-200 bg-white shadow-md">
         <div className="bg-brand-800 px-6 py-4">
-          <p className="text-xs font-semibold uppercase tracking-widest text-brand-300">Szczegóły zamówienia</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-brand-300">Szczegóły sprzedaży</p>
           <div className="mt-1 flex flex-wrap items-center justify-between gap-3">
-            <h1 className="text-2xl font-bold text-white">Zamówienie</h1>
+            <h1 className="text-2xl font-bold text-white">Sprzedaż</h1>
             <Badge variant={orderStatusVariant[order.status]}>
               {orderStatusLabels[order.status]}
             </Badge>
@@ -73,7 +73,7 @@ const OrderDetailPage = () => {
         <div className="px-6 py-4">
           <dl className="divide-y divide-brand-50 rounded-xl border border-brand-100 bg-cream-50">
             <div className="flex items-center justify-between px-4 py-2.5 text-sm">
-              <dt className="text-gray-500">Numer zamówienia</dt>
+              <dt className="text-gray-500">Numer sprzedaży</dt>
               <dd className="font-mono text-xs font-medium text-brand-800">{order.id}</dd>
             </div>
             <div className="flex items-center justify-between px-4 py-2.5 text-sm">
@@ -233,4 +233,4 @@ const OrderDetailPage = () => {
   );
 };
 
-export default OrderDetailPage;
+export default SaleDetailPage;

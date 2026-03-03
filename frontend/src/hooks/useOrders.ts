@@ -65,3 +65,11 @@ export function usePayOrder() {
     },
   });
 }
+
+export function useSellerOrders(sellerId: string) {
+  return useQuery({
+    queryKey: [...orderKeys.all, 'seller', sellerId] as const,
+    queryFn: () => ordersApi.getSellersOrders(sellerId),
+    enabled: !!sellerId,
+  });
+}

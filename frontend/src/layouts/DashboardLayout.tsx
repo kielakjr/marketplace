@@ -6,6 +6,7 @@ const navItems = [
   { to: '/dashboard', label: 'Przegląd', end: true },
   { to: '/dashboard/my-products', label: 'Moje produkty' },
   { to: '/dashboard/orders', label: 'Zamówienia' },
+  { to: '/dashboard/sales', label: 'Sprzedaż' },
 ];
 
 export const DashboardLayout = () => {

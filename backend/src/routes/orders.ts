@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
   createOrder, getUserOrders, getOrderById, cancelOrder,
-  getAllOrders, updateOrderStatus,
+  getAllOrders, updateOrderStatus, getSellerOrders
 } from "../controllers/orders";
 import { requireAuth, requireAdmin } from "../middleware/auth";
 
@@ -13,6 +13,8 @@ router.post("/", createOrder);
 router.get("/", getUserOrders);
 router.get("/:id", getOrderById);
 router.patch("/:id/cancel", cancelOrder);
+
+router.get("/seller/:id", getSellerOrders);
 
 router.get("/admin/all", requireAdmin, getAllOrders);
 router.patch("/admin/:id/status", requireAdmin, updateOrderStatus);

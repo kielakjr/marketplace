@@ -77,3 +77,13 @@ export async function updateOrderStatus(req: Request<{ id: string }>, res: Respo
     res.status(500).json({ error: "Failed to update order" });
   }
 }
+
+export async function getSellerOrders(req: Request, res: Response) {
+  try {
+    const orders = await OrderService.getSellerOrders(req.user!.userId);
+    res.json(orders);
+  } catch (error: unknown) {
+    if (error instanceof Error) return res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Failed to fetch orders" });
+  }
+}

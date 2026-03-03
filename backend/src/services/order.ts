@@ -163,4 +163,20 @@ export class OrderService {
     await order.update({ status });
     return order;
   }
+
+  static async getSellerOrders(sellerId: string) {
+    return Order.findAll({
+      include: [
+        {
+          model: Product,
+          where: { user_id: sellerId },
+          through: { attributes: ["quantity", "price_per_unit"] },
+        },
+        { model: User, as: "buyer", attributes: ["id", "username", "email"] },
+        { model: Payment, as: "payment" },
+        { model: Delivery, as: "delivery" },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+  }
 }

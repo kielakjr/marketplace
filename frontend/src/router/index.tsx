@@ -19,7 +19,9 @@ import AdminOrders from '@/pages/admin/AdminOrders';
 import NotFoundPage from '@/pages/NotFoundPage';
 import OrdersPage from '@/pages/OrdersPage';
 import OrderDetailPage from '@/pages/OrderDetailPage';
+import SaleDetailPage from '@/pages/SaleDetailPage';
 import CheckoutPage from '@/pages/CheckoutPage';
+import SalesPage from '@/pages/SalesPage';
 
 export const router = createBrowserRouter([
   {
@@ -41,7 +43,9 @@ export const router = createBrowserRouter([
               { index: true, element: <DashboardPage /> },
               { path: 'my-products', element: <MyProductsPage /> },
               { path: 'orders', element: <OrdersPage /> },
-              { path: 'orders/:id', element: <OrderDetailPage />}
+              { path: 'orders/:id', element: <OrderDetailPage />},
+              { path: 'sales', element: <SalesPage /> },
+              { path: 'sales/:id', element: <SaleDetailPage /> },
             ],
           },
         ],
