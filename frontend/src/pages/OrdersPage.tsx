@@ -36,7 +36,7 @@ const OrdersPage = () => {
         <p className="mt-1 text-sm text-gray-600">Śledź statusy i podsumowania swoich zakupów.</p>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 flex flex-col">
         {orders.map((order) => (
           <Link key={order.id} to={`/dashboard/orders/${order.id}`}>
             <Card className="flex flex-col gap-4 transition-all hover:shadow-md hover:border-brand-400 sm:flex-row sm:items-center">
