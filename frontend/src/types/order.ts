@@ -51,3 +51,11 @@ export interface CreateOrderPayload {
     postal_code: string;
   }
 }
+
+export interface OrderDetailed extends Order {
+  buyer: {
+    id: string;
+    username: string;
+    email: string;
+  };
+}

@@ -52,6 +52,20 @@ export class OrderService {
       );
 
       for (const item of orderItemsData) {
+
+        const product = await Product.findByPk(item.product_id, { transaction });
+        if (!product) {
+          throw new Error(`Product ${item.product_id} not found during order item creation`);
+        }
+
+        if (product.quantity_available < item.quantity) {
+          throw new Error(`Insufficient stock for "${product.name}" during order item creation`);
+        }
+
+        if (product.user_id === userId) {
+          throw new Error(`Cannot order your own product "${product.name}"`);
+        }
+
         await OrderItem.create(
           { order_id: order.id, ...item },
           { transaction }
@@ -104,6 +118,7 @@ export class OrderService {
       where: { id: orderId, user_id: userId },
       include: [
         { model: Product, through: { attributes: ["quantity", "price_per_unit"] } },
+        { model: User, as: "buyer", attributes: ["id", "username", "email"] },
         { model: Payment, as: "payment" },
         { model: Delivery, as: "delivery", include: [{ model: Address, as: "address" }] },
       ],

@@ -1,5 +1,5 @@
 import api from './axiosInstance';
-import type { Order, CreateOrderPayload } from '@/types/order';
+import type { Order, CreateOrderPayload, OrderDetailed } from '@/types/order';
 
 export const ordersApi = {
   getAll: () =>
@@ -9,7 +9,7 @@ export const ordersApi = {
     api.get<Order[]>('/orders/admin/all').then((res) => res.data),
 
   getById: (id: string) =>
-    api.get<Order>(`/orders/${id}`).then((res) => res.data),
+    api.get<OrderDetailed>(`/orders/${id}`).then((res) => res.data),
 
   getSellersOrders: (sellerId: string) =>
     api.get<Order[]>(`/orders/seller/${sellerId}`).then((res) => res.data),
