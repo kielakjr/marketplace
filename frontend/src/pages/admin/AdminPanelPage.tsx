@@ -13,7 +13,7 @@ import Button from '@/components/ui/Button';
 const AdminPanelPage = () => {
   const { data: productsData, isLoading: productsLoading } = useProducts();
   const { data: categories, isLoading: categoriesLoading } = useCategories();
-  const { data: usersData, isLoading: usersLoading } = useUsers({ page: 1, limit: 2, sortBy: 'createdAt', sortOrder: 'desc' });
+  const { data: usersData, isLoading: usersLoading } = useUsers({ page: 1, limit: 4, sortBy: 'createdAt', sortOrder: 'desc' });
   const { data: orders, isLoading: ordersLoading, error } = useAdminOrders();
   const usersCount = usersData?.pagination.total ?? 0;
 

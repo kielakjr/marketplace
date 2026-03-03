@@ -5,7 +5,7 @@ import Spinner from '@/components/ui/Spinner';
 import Button from '@/components/ui/Button';
 
 const HomePage = () => {
-  const { data: productsData, isLoading, isError } = useProducts({ limit: 1, sortBy: 'createdAt', sortOrder: 'desc' });
+  const { data: productsData, isLoading, isError } = useProducts({ limit: 4, sortBy: 'createdAt', sortOrder: 'desc' });
 
   const products = productsData?.data || [];
 
