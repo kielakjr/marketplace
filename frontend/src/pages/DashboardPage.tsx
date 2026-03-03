@@ -25,11 +25,7 @@ const DashboardPage = () => {
           Oto szybki przegląd Twojej aktywności oraz najważniejszych akcji.
         </p>
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <Card>
-            <p className="text-sm text-gray-500">Rola</p>
-            <p className="mt-2 text-2xl font-bold text-brand-800">{user?.role}</p>
-          </Card>
+        <div className="mt-6 grid gap-4 sm:grid-cols-1 xl:grid-cols-3">
           <Card>
             <p className="text-sm text-gray-500">Twoje produkty</p>
             {isLoading ? <Spinner size="sm" /> : <p className="mt-2 text-2xl font-bold text-brand-800">{products?.length ?? 0}</p>}

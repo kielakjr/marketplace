@@ -13,9 +13,11 @@ import Button from '@/components/ui/Button';
 const AdminPanelPage = () => {
   const { data: productsData, isLoading: productsLoading } = useProducts();
   const { data: categories, isLoading: categoriesLoading } = useCategories();
-  const { data: usersData, isLoading: usersLoading } = useUsers({ page: 1, limit: 4, sortBy: 'createdAt', sortOrder: 'desc' });
+  const { data: usersData, isLoading: usersLoading } = useUsers({ page: 1, limit: 2, sortBy: 'createdAt', sortOrder: 'desc' });
   const { data: orders, isLoading: ordersLoading, error } = useAdminOrders();
+  const usersCount = usersData?.pagination.total ?? 0;
 
+  console.log('AdminPanelPage render - users count:', usersData);
   const isLoading = productsLoading || categoriesLoading || usersLoading || ordersLoading;
 
   const products = productsData?.data || [];
@@ -44,7 +46,7 @@ const AdminPanelPage = () => {
           </Card>
           <Card className="flex flex-col gap-2">
             <p className="text-xs uppercase tracking-wide text-brand-500">Użytkownicy</p>
-            {isLoading ? <Spinner size="sm" /> : <p className="text-2xl font-bold text-brand-800">{usersData?.data.length ?? 0}</p>}
+            {isLoading ? <Spinner size="sm" /> : <p className="text-2xl font-bold text-brand-800">{usersCount}</p>}
             <p className="text-xs text-gray-500">Zarejestrowane konta</p>
           </Card>
           <Card className="flex flex-col gap-2">
