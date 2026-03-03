@@ -57,9 +57,7 @@ const AdminUsers = () => {
             <UserCard
               key={user.id}
               user={user}
-              onChangeRole={() => {}}
               onEdit={() => {}}
-              onDelete={() => {}}
             />
           ))}
         </div>

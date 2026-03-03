@@ -70,4 +70,13 @@ export class UserService {
     }
     return user.destroy();
   }
+
+  static async toggleRole(id: string) {
+    const user = await User.findByPk(id);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    const newRole = user.role === 'ADMIN' ? 'USER' : 'ADMIN';
+    return user.update({ role: newRole });
+  }
 }

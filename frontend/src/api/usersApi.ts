@@ -23,4 +23,16 @@ export const usersApi = {
 
   getById: (id: string) =>
     api.get<User>(`/users/${id}`).then((res) => res.data),
+
+  create: (data: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) =>
+    api.post<User>('/users', data).then((res) => res.data),
+
+  update: (id: string, data: Partial<Omit<User, 'id' | 'createdAt' | 'updatedAt'>>) =>
+    api.put<User>(`/users/${id}`, data).then((res) => res.data),
+
+  delete: (id: string) =>
+    api.delete(`/users/${id}`).then((res) => res.data),
+
+  toggleRole: (id: string) =>
+    api.post(`/users/${id}/toggle-role`).then((res) => res.data),
 };

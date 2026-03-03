@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { usersApi } from '@/api/usersApi';
-import type { UsersFilters } from '@/types/user';
+import type { User, UsersFilters } from '@/types/user';
 
 export const userKeys = {
   all: ['users'] as const,
@@ -20,5 +20,57 @@ export function useUser(id: string) {
     queryKey: userKeys.detail(id),
     queryFn: () => usersApi.getById(id),
     enabled: !!id,
+  });
+}
+
+export function useCurrentUser() {
+  return useQuery({
+    queryKey: userKeys.me,
+    queryFn: () => usersApi.getMe(),
+  });
+}
+
+export function useUserToggleRole(id: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => usersApi.toggleRole(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: userKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: userKeys.all });
+    },
+  });
+}
+
+export function useUserDelete(id: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => usersApi.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: userKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: userKeys.all });
+    },
+  });
+}
+
+export function useUserUpdate(id: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Partial<Omit<User, 'id' | 'createdAt' | 'updatedAt'>>) =>
+      usersApi.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: userKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: userKeys.all });
+    },
+  });
+}
+
+export function useUserCreate() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) =>
+      usersApi.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: userKeys.all });
+    },
   });
 }

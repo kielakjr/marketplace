@@ -1,13 +1,14 @@
 import type { User } from '@/types/user';
+import { useUserToggleRole, useUserDelete } from '@/hooks/useUsers';
 
 interface Props {
   user: User;
   onEdit: (id: string) => void;
-  onDelete: (id: string) => void;
-  onChangeRole: (id: string) => void;
 }
 
-export default function UserCard({ user, onEdit, onDelete, onChangeRole }: Props) {
+export default function UserCard({ user, onEdit }: Props) {
+  const toggleRoleMutation = useUserToggleRole(user.id);
+  const deleteMutation = useUserDelete(user.id);
   const isAdmin = user.role === 'ADMIN';
 
   const createdAt = new Date(user.createdAt).toLocaleDateString('pl-PL', {
@@ -64,7 +65,7 @@ export default function UserCard({ user, onEdit, onDelete, onChangeRole }: Props
           Edytuj
         </button>
         <button
-          onClick={() => onChangeRole(user.id)}
+          onClick={() => toggleRoleMutation.mutate()}
           className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-brand-200 bg-white px-3 py-2 text-sm font-medium text-brand-700 transition hover:bg-brand-50"
         >
           <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -73,7 +74,7 @@ export default function UserCard({ user, onEdit, onDelete, onChangeRole }: Props
           Rola
         </button>
         <button
-          onClick={() => onDelete(user.id)}
+          onClick={() => deleteMutation.mutate()}
           className="flex items-center justify-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-100"
         >
           <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

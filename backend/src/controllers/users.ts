@@ -105,3 +105,18 @@ export async function deleteUser(req: Request<{ id: string }>, res: Response) {
     res.status(500).json({ error: "Failed to delete user" });
   }
 }
+
+export async function toggleUserRole(req: Request<{ id: string }>, res: Response) {
+  try {
+    const user = await UserService.toggleRole(req.params.id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.json(user);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return res.status(404).json({ error: error.message });
+    }
+    res.status(500).json({ error: "Failed to toggle user role" });
+  }
+}
