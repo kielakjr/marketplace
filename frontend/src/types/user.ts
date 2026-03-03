@@ -7,6 +7,25 @@ export interface User {
   updatedAt: string;
 }
 
+export interface UsersData {
+  data: User[];
+  pagination : {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  }
+}
+
+export interface UsersFilters {
+  username?: string;
+  email?: string;
+  sortBy?: 'username' | 'email' | 'createdAt';
+  sortOrder?: 'asc' | 'desc';
+  limit?: number;
+  page?: number;
+}
+
 export interface UserCreationPayload {
   username: string;
   email: string;

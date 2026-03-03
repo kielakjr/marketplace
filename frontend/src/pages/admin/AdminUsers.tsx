@@ -1,23 +1,20 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useUsers } from '@/hooks/useUsers';
+import { useDebounce } from '@/hooks/useDebounce';
 import UserCard from '@/components/UserCard';
 import Spinner from '@/components/ui/Spinner';
 import Button from '@/components/ui/Button';
 
 const AdminUsers = () => {
-  const { data: users, isLoading, isError } = useUsers();
   const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 500);
+  const { data: usersData, isLoading, isError } = useUsers({ page: 1, limit: 2, username: debouncedQuery });
 
-  const filteredUsers = useMemo(() => {
-    if (!users) return [];
-    const lower = query.toLowerCase();
-    return users.filter((user) =>
-      [user.username, user.email, user.role].some((value) => value.toLowerCase().includes(lower))
-    );
-  }, [users, query]);
 
   if (isLoading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>;
   if (isError) return <div className="text-center text-red-600">Nie udało się załadować użytkowników.</div>;
+
+  const { data: filteredUsers } = usersData!;
 
   return (
     <div className="space-y-6">

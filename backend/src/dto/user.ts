@@ -18,3 +18,12 @@ export interface UserUpdateAttributes {
   email?: string;
   password?: string;
 }
+
+export interface UserFilters {
+  username?: string;
+  email?: string;
+  sortBy?: 'name' | 'email' | 'createdAt';
+  sortOrder?: 'asc' | 'desc';
+  limit?: number;
+  page?: number;
+}

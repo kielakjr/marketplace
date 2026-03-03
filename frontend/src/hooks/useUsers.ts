@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { usersApi } from '@/api/usersApi';
+import type { UsersFilters } from '@/types/user';
 
 export const userKeys = {
   all: ['users'] as const,
@@ -7,10 +8,10 @@ export const userKeys = {
   me: ['users', 'me'] as const,
 };
 
-export function useUsers() {
+export function useUsers(filters?: Partial<UsersFilters>) {
   return useQuery({
-    queryKey: userKeys.all,
-    queryFn: usersApi.getAll,
+    queryKey: [...userKeys.all, filters],
+    queryFn: () => usersApi.getAll(filters),
   });
 }
 

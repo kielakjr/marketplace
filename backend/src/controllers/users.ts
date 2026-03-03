@@ -1,16 +1,54 @@
 import { UserService } from "../services/user";
 import { Request, Response } from "express";
-import { UserCreationAttributes, UserUpdateAttributes } from "../dto/user";
+import { UserCreationAttributes, UserUpdateAttributes, UserFilters } from "../dto/user";
 
-export async function getUsers(req: Request, res: Response) {
+export async function getUsers(req: Request<{}, {}, {}, UserFilters>, res: Response) {
   try {
-    const users = await UserService.getAllUsers();
-    res.json(users);
+    const filters: UserFilters = {};
+
+    if (req.query.username) {
+      filters.username = req.query.username as string;
+    }
+
+    if (req.query.email) {
+      filters.email = req.query.email as string;
+    }
+
+    if (req.query.sortBy) {
+      const VALID_SORT_BY = ['name', 'email', 'createdAt'] as const;
+      if (!VALID_SORT_BY.includes(req.query.sortBy as any)) {
+        return res.status(400).json({ error: `sortBy must be one of: ${VALID_SORT_BY.join(', ')}` });
+      }
+      filters.sortBy = req.query.sortBy as 'name' | 'email' | 'createdAt';
+    }
+
+    if (req.query.sortOrder) {
+      const VALID_SORT_ORDER = ['asc', 'desc'] as const;
+      if (!VALID_SORT_ORDER.includes(req.query.sortOrder as any)) {
+        return res.status(400).json({ error: `sortOrder must be one of: asc, desc` });
+      }
+      filters.sortOrder = req.query.sortOrder as 'asc' | 'desc';
+    }
+
+    if (req.query.limit) {
+      const limit = parseInt(req.query.limit as unknown as string);
+      if (isNaN(limit) || limit < 1) return res.status(400).json({ error: 'Invalid limit' });
+      filters.limit = limit;
+    }
+
+    if (req.query.page) {
+      const page = parseInt(req.query.page as unknown as string);
+      if (isNaN(page) || page < 1) return res.status(400).json({ error: 'Invalid page' });
+      filters.page = page;
+    }
+
+    const result = await UserService.getAllUsers(filters);
+    res.json(result);
   } catch (error: unknown) {
     if (error instanceof Error) {
       return res.status(500).json({ error: error.message });
     }
-    res.status(500).json({ error: "Failed to fetch users" });
+    res.status(500).json({ error: 'Failed to fetch users' });
   }
 }
 

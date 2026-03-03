@@ -11,14 +11,16 @@ import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 
 const AdminPanelPage = () => {
-  const { data: products, isLoading: productsLoading } = useProducts();
+  const { data: productsData, isLoading: productsLoading } = useProducts();
   const { data: categories, isLoading: categoriesLoading } = useCategories();
-  const { data: users, isLoading: usersLoading } = useUsers();
+  const { data: usersData, isLoading: usersLoading } = useUsers({ page: 1, limit: 4, sortBy: 'createdAt', sortOrder: 'desc' });
   const { data: orders, isLoading: ordersLoading, error } = useAdminOrders();
 
   const isLoading = productsLoading || categoriesLoading || usersLoading || ordersLoading;
 
-  const latestUsers = users?.slice(0, 4) ?? [];
+  const products = productsData?.data || [];
+
+  const latestUsers = usersData?.data ?? [];
   const latestOrders = orders?.slice(0, 4) ?? [];
 
   return (
@@ -42,7 +44,7 @@ const AdminPanelPage = () => {
           </Card>
           <Card className="flex flex-col gap-2">
             <p className="text-xs uppercase tracking-wide text-brand-500">Użytkownicy</p>
-            {isLoading ? <Spinner size="sm" /> : <p className="text-2xl font-bold text-brand-800">{users?.length ?? 0}</p>}
+            {isLoading ? <Spinner size="sm" /> : <p className="text-2xl font-bold text-brand-800">{usersData?.data.length ?? 0}</p>}
             <p className="text-xs text-gray-500">Zarejestrowane konta</p>
           </Card>
           <Card className="flex flex-col gap-2">

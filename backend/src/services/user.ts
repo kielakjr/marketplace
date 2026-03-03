@@ -1,13 +1,45 @@
 import { User } from '../models'
+import { Op } from 'sequelize';
 import bcrypt from 'bcrypt';
-import { UserCreationAttributes, UserUpdateAttributes } from '../dto/user';
+import { UserCreationAttributes, UserUpdateAttributes, UserFilters } from '../dto/user';
 import { createUserSchema, updateUserSchema} from '../validation/user';
 
 
 export class UserService {
-  static async getAllUsers() {
-    return User.findAll();
+  static async getAllUsers(filters?: Partial<UserFilters>) {
+  const where: any = {};
+
+  if (filters?.username) {
+    where.username = { [Op.like]: `%${filters.username}%` };
   }
+
+  if (filters?.email) {
+    where.email = { [Op.like]: `%${filters.email}%` };
+  }
+
+  const sortBy = filters?.sortBy ?? 'createdAt';
+  const sortOrder = filters?.sortOrder ?? 'asc';
+  const limit = filters?.limit ?? 20;
+  const page = filters?.page ?? 1;
+  const offset = (page - 1) * limit;
+
+  const { rows: users, count: total } = await User.findAndCountAll({
+    where,
+    order: [[sortBy, sortOrder]],
+    limit,
+    offset,
+  });
+
+  return {
+    data: users,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+}
 
   static async getUserById(id: string) {
     return User.findByPk(id);

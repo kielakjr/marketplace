@@ -20,7 +20,7 @@ const ProductsPage = () => {
   const debouncedMinPrice = useDebounce(minPrice, 500);
   const debouncedMaxPrice = useDebounce(maxPrice, 500);
 
-  const { data: products, isLoading, isError } = useProducts({
+  const { data: productsData, isLoading, isError } = useProducts({
     name: debouncedSearch || undefined,
     categoryId,
     minPrice: debouncedMinPrice,
@@ -28,6 +28,8 @@ const ProductsPage = () => {
     sortBy,
     sortOrder,
   });
+
+  const products = productsData?.data || [];
 
   const { data: categories, isLoading: isCategoriesLoading, isError: isCategoriesError } = useCategories();
 
