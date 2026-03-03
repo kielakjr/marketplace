@@ -24,12 +24,28 @@ export class ProductService {
       where.price = { [Op.between]: [filters.minPrice, filters.maxPrice] };
     }
 
-    if (filters?.sortBy && filters?.sortOrder) {
-      return Product.findAll({ where, order: [[filters.sortBy, filters.sortOrder]] });
-    }
+    const sortBy = filters?.sortBy ?? 'createdAt';
+    const sortOrder = filters?.sortOrder ?? 'asc';
+    const limit = filters?.limit ?? 20;
+    const page = filters?.page ?? 1;
+    const offset = (page - 1) * limit;
 
-    return Product.findAll({ where });
+    const { rows: products, count: total } = await Product.findAndCountAll({
+      where,
+      order: [[sortBy, sortOrder]],
+      limit,
+      offset,
+    });
 
+    return {
+      data: products,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   static async getProductById(id: string): Promise<ProductDTO | null> {

@@ -1,9 +1,9 @@
 import api from './axiosInstance';
-import type { Product, ProductCreationPayload, ProductUpdatePayload, ProductFilters, ProductWithCategoryAndSeller } from '@/types/product';
+import type { Product, ProductCreationPayload, ProductUpdatePayload, ProductFilters, ProductWithCategoryAndSeller, ProductsData } from '@/types/product';
 
 export const productsApi = {
   getAll: (filters?: ProductFilters) =>
-    api.get<Product[]>('/products', { params: filters }).then((res) => res.data),
+    api.get<ProductsData>('/products', { params: filters }).then((res) => res.data),
 
   getById: (id: string) =>
     api.get<ProductWithCategoryAndSeller>(`/products/${id}`).then((res) => res.data),

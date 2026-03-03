@@ -15,15 +15,60 @@ interface ProductUpdateAttributes {
   price?: number;
 }
 
+const VALID_SORT_BY = ['price', 'createdAt'] as const;
+const VALID_SORT_ORDER = ['asc', 'desc'] as const;
+
 export async function getProducts(req: Request<{}, {}, {}, ProductFilters>, res: Response) {
   try {
     const filters: ProductFilters = {};
-    if (req.query.name) filters.name = req.query.name as string;
-    if (req.query.categoryId) filters.categoryId = parseInt(req.query.categoryId as unknown as string);
-    if (req.query.minPrice) filters.minPrice = parseFloat(req.query.minPrice as unknown as string);
-    if (req.query.maxPrice) filters.maxPrice = parseFloat(req.query.maxPrice as unknown as string);
-    if (req.query.sortBy) filters.sortBy = req.query.sortBy as 'price' | 'createdAt';
-    if (req.query.sortOrder) filters.sortOrder = req.query.sortOrder as 'asc' | 'desc';
+
+    if (req.query.name) {
+      filters.name = req.query.name as string;
+    }
+
+    if (req.query.categoryId) {
+      const categoryId = parseInt(req.query.categoryId as unknown as string);
+      if (isNaN(categoryId)) return res.status(400).json({ error: 'Invalid categoryId' });
+      filters.categoryId = categoryId;
+    }
+
+    if (req.query.minPrice) {
+      const minPrice = parseFloat(req.query.minPrice as unknown as string);
+      if (isNaN(minPrice)) return res.status(400).json({ error: 'Invalid minPrice' });
+      filters.minPrice = minPrice;
+    }
+
+    if (req.query.maxPrice) {
+      const maxPrice = parseFloat(req.query.maxPrice as unknown as string);
+      if (isNaN(maxPrice)) return res.status(400).json({ error: 'Invalid maxPrice' });
+      filters.maxPrice = maxPrice;
+    }
+
+    if (req.query.sortBy) {
+      if (!VALID_SORT_BY.includes(req.query.sortBy as any)) {
+        return res.status(400).json({ error: `sortBy must be one of: ${VALID_SORT_BY.join(', ')}` });
+      }
+      filters.sortBy = req.query.sortBy as 'price' | 'createdAt';
+    }
+
+    if (req.query.sortOrder) {
+      if (!VALID_SORT_ORDER.includes(req.query.sortOrder as any)) {
+        return res.status(400).json({ error: `sortOrder must be one of: ${VALID_SORT_ORDER.join(', ')}` });
+      }
+      filters.sortOrder = req.query.sortOrder as 'asc' | 'desc';
+    }
+
+    if (req.query.limit) {
+      const limit = parseInt(req.query.limit as unknown as string);
+      if (isNaN(limit) || limit < 1) return res.status(400).json({ error: 'Invalid limit' });
+      filters.limit = limit;
+    }
+
+    if (req.query.page) {
+      const page = parseInt(req.query.page as unknown as string);
+      if (isNaN(page) || page < 1) return res.status(400).json({ error: 'Invalid page' });
+      filters.page = page;
+    }
 
     const products = await ProductService.getProducts(filters);
     res.json(products);

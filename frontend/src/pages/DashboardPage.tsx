@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 import { useAppSelector } from '@/store/hooks';
-import { useProducts } from '@/hooks/useProducts';
+import { useUserProducts } from '@/hooks/useProducts';
 import { useOrders } from '@/hooks/useOrders';
 import { formatPrice } from '@/utils/formatPrice';
 import { orderStatusLabels, orderStatusVariant } from '@/utils/orderStatus';
@@ -11,10 +11,9 @@ import Badge from '@/components/ui/Badge';
 
 const DashboardPage = () => {
   const { user } = useAppSelector((state) => state.auth);
-  const { data: products, isLoading: productsLoading } = useProducts();
+  const { data: products, isLoading: productsLoading } = useUserProducts(user!.id);
   const { data: orders, isLoading: ordersLoading } = useOrders();
 
-  const myProducts = products?.filter((p) => p.user_id === user?.id) ?? [];
   const isLoading = productsLoading || ordersLoading;
   const latestOrders = orders?.slice(0, 3) ?? [];
 
@@ -33,7 +32,7 @@ const DashboardPage = () => {
           </Card>
           <Card>
             <p className="text-sm text-gray-500">Twoje produkty</p>
-            {isLoading ? <Spinner size="sm" /> : <p className="mt-2 text-2xl font-bold text-brand-800">{myProducts.length}</p>}
+            {isLoading ? <Spinner size="sm" /> : <p className="mt-2 text-2xl font-bold text-brand-800">{products?.length ?? 0}</p>}
           </Card>
           <Card>
             <p className="text-sm text-gray-500">Zamówienia</p>

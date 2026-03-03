@@ -5,6 +5,8 @@ export interface ProductFilters {
   maxPrice?: number;
   sortBy?: 'price' | 'createdAt';
   sortOrder?: 'asc' | 'desc';
+  limit?: number;
+  page?: number;
 }
 
 export interface ProductDTO {
