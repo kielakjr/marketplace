@@ -31,10 +31,17 @@ export class Order extends Model {
 
   @ForeignKey(() => User)
   @Column(DataType.UUID)
-  user_id!: string;
+  buyer_id!: string;
 
-  @BelongsTo(() => User, 'user_id')
+  @ForeignKey(() => User)
+  @Column(DataType.UUID)
+  seller_id!: string;
+
+  @BelongsTo(() => User, 'buyer_id')
   buyer!: User;
+
+  @BelongsTo(() => User, 'seller_id')
+  seller!: User;
 
   @HasOne(() => Payment, 'order_id')
   payment!: Payment;

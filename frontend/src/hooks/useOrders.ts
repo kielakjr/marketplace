@@ -1,11 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ordersApi } from '@/api/ordersApi';
-import type { CreateOrderPayload} from '@/types/order';
+import type { CreateOrderPayload } from '@/types/order';
 import { useAppSelector } from '@/store/hooks';
 
 export const orderKeys = {
   all: ['orders'] as const,
   detail: (id: string) => [...orderKeys.all, id] as const,
+  seller: () => [...orderKeys.all, 'seller'] as const,
+  saleDetail: (id: string) => [...orderKeys.seller(), id] as const,
+  admin: () => [...orderKeys.all, 'admin'] as const,
+  adminDetail: (id: string) => [...orderKeys.admin(), id] as const,
 };
 
 export function useOrders() {
@@ -14,16 +18,6 @@ export function useOrders() {
     queryKey: orderKeys.all,
     queryFn: ordersApi.getAll,
     enabled: isAuthenticated,
-  });
-}
-
-export function useAdminOrders() {
-  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
-  const isAdmin = user?.role === 'ADMIN';
-  return useQuery({
-    queryKey: [...orderKeys.all, 'admin'] as const,
-    queryFn: ordersApi.getAdminAll,
-    enabled: isAuthenticated && isAdmin,
   });
 }
 
@@ -66,10 +60,51 @@ export function usePayOrder() {
   });
 }
 
-export function useSellerOrders(sellerId: string) {
+export function useSellerOrders() {
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
   return useQuery({
-    queryKey: [...orderKeys.all, 'seller', sellerId] as const,
-    queryFn: () => ordersApi.getSellersOrders(sellerId),
-    enabled: !!sellerId,
+    queryKey: orderKeys.seller(),
+    queryFn: ordersApi.getSellerOrders,
+    enabled: isAuthenticated,
+  });
+}
+
+export function useSale(id: string) {
+  return useQuery({
+    queryKey: orderKeys.saleDetail(id),
+    queryFn: () => ordersApi.getSaleById(id),
+    enabled: !!id,
+  });
+}
+
+export function useAdminOrders() {
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+  const isAdmin = user?.role === 'ADMIN';
+  return useQuery({
+    queryKey: orderKeys.admin(),
+    queryFn: ordersApi.adminGetAll,
+    enabled: isAuthenticated && isAdmin,
+  });
+}
+
+export function useAdminOrder(id: string) {
+  const { user } = useAppSelector((state) => state.auth);
+  const isAdmin = user?.role === 'ADMIN';
+  return useQuery({
+    queryKey: orderKeys.adminDetail(id),
+    queryFn: () => ordersApi.adminGetById(id),
+    enabled: !!id && isAdmin,
+  });
+}
+
+export function useAdminUpdateOrderStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, status }: { id: string; status: string }) =>
+      ordersApi.adminUpdateStatus(id, status),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: orderKeys.admin() });
+      queryClient.invalidateQueries({ queryKey: orderKeys.adminDetail(id) });
+    },
   });
 }

@@ -87,3 +87,29 @@ export async function getSellerOrders(req: Request, res: Response) {
     res.status(500).json({ error: "Failed to fetch orders" });
   }
 }
+
+export async function getSaleById(req: Request<{ id: string }>, res: Response) {
+  try {
+    const sale = await OrderService.getSaleById(req.params.id, req.user!.userId);
+    res.json(sale);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.message === "Sale not found") return res.status(404).json({ error: error.message });
+      return res.status(500).json({ error: error.message });
+    }
+    res.status(500).json({ error: "Failed to fetch sale" });
+  }
+}
+
+export async function adminGetOrderById(req: Request<{ id: string }>, res: Response) {
+  try {
+    const order = await OrderService.adminGetOrderById(req.params.id);
+    res.json(order);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.message === "Order not found") return res.status(404).json({ error: error.message });
+      return res.status(500).json({ error: error.message });
+    }
+    res.status(500).json({ error: "Failed to fetch order" });
+  }
+}

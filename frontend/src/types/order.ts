@@ -30,16 +30,28 @@ export interface OrderDelivery {
   };
 }
 
+export interface OrderUser {
+  id: string;
+  username: string;
+  email: string;
+}
+
 export interface Order {
   id: string;
   total_amount: number;
   status: OrderStatus;
-  user_id: string;
+  buyer_id: string;
+  seller_id: string | null;
   products: OrderItemProduct[];
   payment: OrderPayment | null;
   delivery: OrderDelivery | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface OrderDetailed extends Order {
+  buyer: OrderUser;
+  seller: OrderUser | null;
 }
 
 export interface CreateOrderPayload {
@@ -49,13 +61,5 @@ export interface CreateOrderPayload {
     street_number: string;
     city: string;
     postal_code: string;
-  }
-}
-
-export interface OrderDetailed extends Order {
-  buyer: {
-    id: string;
-    username: string;
-    email: string;
   };
 }

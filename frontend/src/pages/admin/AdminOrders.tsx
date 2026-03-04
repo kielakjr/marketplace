@@ -47,6 +47,14 @@ const AdminOrders = () => {
               <p className="mt-1 text-sm text-gray-600">
                 {order.products.length} {order.products.length === 1 ? 'produkt' : 'produktów'}
               </p>
+              {order.buyer && (
+                <p className="mt-0.5 text-xs text-gray-400">
+                  Kupujący: <span className="font-medium text-brand-700">{order.buyer.username}</span>
+                  {order.seller && (
+                    <> · Sprzedający: <span className="font-medium text-brand-700">{order.seller.username}</span></>
+                  )}
+                </p>
+              )}
             </div>
             <div className="flex items-center gap-4">
               <Badge variant={orderStatusVariant[order.status]}>
@@ -56,7 +64,7 @@ const AdminOrders = () => {
                 {formatPrice(parseFloat(order.total_amount.toString()))}
               </span>
               <Link
-                to={`/dashboard/orders/${order.id}`}
+                to={`/admin/orders/${order.id}`}
                 className="text-sm font-medium text-brand-500 hover:text-brand-800"
               >
                 Szczegóły →

@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router';
-import { useOrder, useCancelOrder } from '@/hooks/useOrders';
+import { useSale } from '@/hooks/useOrders';
 import { formatPrice } from '@/utils/formatPrice';
 import { orderStatusLabels, orderStatusVariant, paymentStatusLabels, deliveryStatusLabels } from '@/utils/orderStatus';
 import Spinner from '@/components/ui/Spinner';
@@ -8,8 +8,7 @@ import Button from '@/components/ui/Button';
 
 const SaleDetailPage = () => {
   const { id } = useParams<{ id: string }>();
-  const { data: order, isLoading, isError } = useOrder(id!);
-  const cancelOrder = useCancelOrder();
+  const { data: order, isLoading, isError } = useSale(id!);
 
   if (isLoading)
     return (
@@ -27,8 +26,8 @@ const SaleDetailPage = () => {
           </svg>
         </div>
         <div>
-          <p className="text-base font-semibold text-red-700">Nie znaleziono zamówienia</p>
-          <p className="mt-1 text-sm text-red-500">Zamówienie mogło zostać usunięte lub link jest nieprawidłowy.</p>
+          <p className="text-base font-semibold text-red-700">Nie znaleziono sprzedaży</p>
+          <p className="mt-1 text-sm text-red-500">Sprzedaż mogła zostać usunięta lub link jest nieprawidłowy.</p>
         </div>
         <Link
           to="/dashboard/sales"
@@ -43,8 +42,7 @@ const SaleDetailPage = () => {
     );
   }
 
-  const canCancel = order?.status === 'PENDING' || order?.status === 'PROCESSING';
-  const canShip = order?.payment?.status === 'PAID' && order?.delivery?.status === 'PREPARING';
+  const canShip = order.payment?.status === 'PAID' && order.delivery?.status === 'PREPARING';
   const isPaid = order.payment?.status === 'PAID';
 
   const createdAt = new Date(order.createdAt).toLocaleString('pl-PL', {
@@ -276,27 +274,6 @@ const SaleDetailPage = () => {
           </div>
         )}
       </div>
-
-      {canCancel && (
-        <div className="flex justify-end">
-          <Button
-            variant="danger"
-            onClick={() => {
-              if (window.confirm('Czy na pewno chcesz anulować to zamówienie?')) {
-                cancelOrder.mutate(order.id);
-              }
-            }}
-            isLoading={cancelOrder.isPending}
-          >
-            <span className="flex items-center gap-2">
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-              Anuluj zamówienie
-            </span>
-          </Button>
-        </div>
-      )}
     </div>
   );
 };

@@ -17,6 +17,7 @@ export class OrderService {
     try {
       let totalAmount = 0;
       const orderItemsData: { product_id: string; quantity: number; price_per_unit: number }[] = [];
+      const sellerIds = new Set<string>();
 
       for (const item of items) {
         const product = await Product.findByPk(item.product_id, { transaction });
@@ -26,6 +27,11 @@ export class OrderService {
         if (product.quantity_available < item.quantity) {
           throw new Error(`Insufficient stock for "${product.name}"`);
         }
+        if (product.user_id === userId) {
+          throw new Error(`Cannot order your own product "${product.name}"`);
+        }
+
+        sellerIds.add(product.user_id);
 
         const pricePerUnit = parseFloat(product.price.toString());
         totalAmount += pricePerUnit * item.quantity;
@@ -36,8 +42,11 @@ export class OrderService {
         });
       }
 
+      // If all products come from the same seller, store seller_id directly on the order
+      const sellerId = sellerIds.size === 1 ? [...sellerIds][0] : null;
+
       const order = await Order.create(
-        { user_id: userId, total_amount: totalAmount, status: "PENDING" },
+        { buyer_id: userId, seller_id: sellerId, total_amount: totalAmount, status: "PENDING" },
         { transaction }
       );
 
@@ -52,20 +61,6 @@ export class OrderService {
       );
 
       for (const item of orderItemsData) {
-
-        const product = await Product.findByPk(item.product_id, { transaction });
-        if (!product) {
-          throw new Error(`Product ${item.product_id} not found during order item creation`);
-        }
-
-        if (product.quantity_available < item.quantity) {
-          throw new Error(`Insufficient stock for "${product.name}" during order item creation`);
-        }
-
-        if (product.user_id === userId) {
-          throw new Error(`Cannot order your own product "${product.name}"`);
-        }
-
         await OrderItem.create(
           { order_id: order.id, ...item },
           { transaction }
@@ -103,7 +98,7 @@ export class OrderService {
 
   static async getUserOrders(userId: string) {
     return Order.findAll({
-      where: { user_id: userId },
+      where: { buyer_id: userId },
       include: [
         { model: Product, through: { attributes: ["quantity", "price_per_unit"] } },
         { model: Payment, as: "payment" },
@@ -115,10 +110,40 @@ export class OrderService {
 
   static async getOrderById(orderId: string, userId: string) {
     const order = await Order.findOne({
-      where: { id: orderId, user_id: userId },
+      where: { id: orderId, buyer_id: userId },
       include: [
         { model: Product, through: { attributes: ["quantity", "price_per_unit"] } },
         { model: User, as: "buyer", attributes: ["id", "username", "email"] },
+        { model: Payment, as: "payment" },
+        { model: Delivery, as: "delivery", include: [{ model: Address, as: "address" }] },
+      ],
+    });
+    if (!order) throw new Error("Order not found");
+    return order;
+  }
+
+  static async getSaleById(orderId: string, sellerId: string) {
+    const order = await Order.findOne({
+      where: { id: orderId, seller_id: sellerId },
+      include: [
+        { model: Product, through: { attributes: ["quantity", "price_per_unit"] } },
+        { model: User, as: "buyer", attributes: ["id", "username", "email"] },
+        { model: User, as: "seller", attributes: ["id", "username", "email"] },
+        { model: Payment, as: "payment" },
+        { model: Delivery, as: "delivery", include: [{ model: Address, as: "address" }] },
+      ],
+    });
+    if (!order) throw new Error("Sale not found");
+    return order;
+  }
+
+  static async adminGetOrderById(orderId: string) {
+    const order = await Order.findOne({
+      where: { id: orderId },
+      include: [
+        { model: Product, through: { attributes: ["quantity", "price_per_unit"] } },
+        { model: User, as: "buyer", attributes: ["id", "username", "email"] },
+        { model: User, as: "seller", attributes: ["id", "username", "email"] },
         { model: Payment, as: "payment" },
         { model: Delivery, as: "delivery", include: [{ model: Address, as: "address" }] },
       ],
@@ -131,7 +156,7 @@ export class OrderService {
     const transaction = await sequelize.transaction();
     try {
       const order = await Order.findOne({
-        where: { id: orderId, user_id: userId },
+        where: { id: orderId, buyer_id: userId },
         include: [{ model: Product, through: { attributes: ["quantity", "price_per_unit"] } }],
         transaction,
       });
@@ -180,14 +205,13 @@ export class OrderService {
   }
 
   static async getSellerOrders(sellerId: string) {
+    console.log('Fetching orders for seller:', sellerId);
     return Order.findAll({
+      where: { seller_id: sellerId },
       include: [
-        {
-          model: Product,
-          where: { user_id: sellerId },
-          through: { attributes: ["quantity", "price_per_unit"] },
-        },
+        { model: Product, through: { attributes: ["quantity", "price_per_unit"] } },
         { model: User, as: "buyer", attributes: ["id", "username", "email"] },
+        { model: User, as: "seller", attributes: ["id", "username", "email"] },
         { model: Payment, as: "payment" },
         { model: Delivery, as: "delivery" },
       ],

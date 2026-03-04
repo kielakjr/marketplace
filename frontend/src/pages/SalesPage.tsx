@@ -5,11 +5,9 @@ import { orderStatusLabels, orderStatusVariant } from '@/utils/orderStatus';
 import Spinner from '@/components/ui/Spinner';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
-import { useAppSelector } from '@/store/hooks';
 
 const SalesPage = () => {
-  const {user} = useAppSelector((state) => state.auth);
-  const { data: orders, isLoading, isError } = useSellerOrders(user!.id);
+  const { data: orders, isLoading, isError } = useSellerOrders();
 
   if (isLoading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>;
   if (isError) return <div className="text-center text-red-600">Nie udało się załadować sprzedaży.</div>;
@@ -38,7 +36,7 @@ const SalesPage = () => {
         <p className="mt-1 text-sm text-gray-600">Śledź statusy i podsumowania swoich sprzedaży.</p>
       </div>
 
-      <div className="space-y-4 flex flex-col">
+      <div className="flex flex-col space-y-4">
         {orders.map((order) => (
           <Link key={order.id} to={`/dashboard/sales/${order.id}`}>
             <Card className="flex flex-col gap-4 transition-all hover:shadow-md hover:border-brand-400 sm:flex-row sm:items-center">
