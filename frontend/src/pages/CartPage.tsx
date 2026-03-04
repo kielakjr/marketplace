@@ -1,12 +1,19 @@
 import { Link } from 'react-router';
-import { useCart, useCartTotal, useClearCart } from '@/hooks/useCart';
+import { useCarts, useCartTotal, useClearCart } from '@/hooks/useCart';
 import CartItem from '@/components/CartItem';
 import Spinner from '@/components/ui/Spinner';
 import Button from '@/components/ui/Button';
 import { formatPrice } from '@/utils/formatPrice';
 
+const SELLER_COLORS = [
+  { bg: 'bg-brand-800', badge: 'bg-brand-100 text-brand-700', border: 'border-brand-200' },
+  { bg: 'bg-emerald-800', badge: 'bg-emerald-100 text-emerald-700', border: 'border-emerald-200' },
+  { bg: 'bg-violet-800', badge: 'bg-violet-100 text-violet-700', border: 'border-violet-200' },
+  { bg: 'bg-rose-800', badge: 'bg-rose-100 text-rose-700', border: 'border-rose-200' },
+];
+
 const CartPage = () => {
-  const { data: cart, isLoading, isError } = useCart();
+  const { data: carts, isLoading, isError } = useCarts();
   const cartTotal = useCartTotal();
   const clearCart = useClearCart();
 
@@ -33,9 +40,9 @@ const CartPage = () => {
     );
   }
 
-  const items = cart?.items ?? [];
+  const allItems = carts?.flatMap((c) => c.items) ?? [];
 
-  if (items.length === 0) {
+  if (!carts || carts.length === 0 || allItems.length === 0) {
     return (
       <div className="flex min-h-[30vh] flex-col items-center justify-center gap-4 rounded-2xl border border-brand-100 bg-white p-12 text-center shadow-sm">
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-50">
@@ -56,28 +63,97 @@ const CartPage = () => {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-brand-800">Koszyk</h1>
-          <p className="mt-1 text-sm text-gray-500">{items.length} {items.length === 1 ? 'produkt' : items.length < 5 ? 'produkty' : 'produktów'}</p>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <span className="text-sm text-gray-500">{allItems.length} {allItems.length === 1 ? 'produkt' : allItems.length < 5 ? 'produkty' : 'produktów'}</span>
+            {carts.length > 1 && (
+              <>
+                <span className="text-gray-300">·</span>
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+                  <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {carts.length} osobne zamówienia od różnych sprzedawców
+                </span>
+              </>
+            )}
+          </div>
         </div>
-        <button
-          onClick={() => clearCart.mutate()}
-          disabled={clearCart.isPending}
-          className="inline-flex items-center gap-1.5 rounded-xl border border-red-200 px-3 py-2 text-sm font-medium text-red-500 transition hover:bg-red-50 hover:text-red-700 disabled:opacity-50"
-        >
-          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-          </svg>
-          Wyczyść koszyk
-        </button>
       </div>
 
+      {carts.length > 1 && (
+        <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4">
+          <svg className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+          <div>
+            <p className="text-sm font-semibold text-amber-800">Masz produkty od {carts.length} różnych sprzedawców</p>
+            <p className="mt-0.5 text-xs text-amber-700">Każde zamówienie zostanie złożone osobno i może być dostarczone w innym terminie.</p>
+          </div>
+        </div>
+      )}
+
       <div className="grid gap-8 lg:grid-cols-[1fr_400px]">
-        <div className="space-y-4">
-          {items.map((item) => (
-            <CartItem key={item.id} item={item} />
-          ))}
+        <div className="space-y-6">
+          {carts.map((cart, index) => {
+            const colors = SELLER_COLORS[index % SELLER_COLORS.length];
+            const cartItemTotal = cart.items.reduce(
+              (sum, item) => sum + (item.product?.price ?? 0) * item.quantity,
+              0
+            );
+            const cartItemCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+
+            return (
+              <div key={cart.id} className={`overflow-hidden rounded-3xl border ${colors.border} bg-white shadow-md`}>
+                <div className={`${colors.bg} px-6 py-4`}>
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15">
+                        <svg className="h-4.5 w-4.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-widest text-white/60">Sprzedawca</p>
+                        <p className="font-semibold text-white">{cart.seller.username ?? `Sprzedawca #${index + 1}`}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white">
+                        {cartItemCount} szt. · {formatPrice(cartItemTotal)}
+                      </span>
+                      <button
+                        onClick={() => clearCart.mutate(cart.seller_id)}
+                        disabled={clearCart.isPending}
+                        className="inline-flex items-center gap-1 rounded-xl bg-white/10 px-2.5 py-1.5 text-xs font-medium text-white/80 transition hover:bg-white/20 disabled:opacity-50"
+                        title="Wyczyść koszyk tego sprzedawcy"
+                      >
+                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Wyczyść
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="divide-y divide-gray-50 p-4">
+                  {cart.items.map((item) => (
+                    <div key={item.id} className="py-2 first:pt-0 last:pb-0">
+                      <CartItem item={item} />
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex items-center justify-between border-t border-gray-100 bg-gray-50 px-6 py-3">
+                  <span className="text-sm text-gray-500">Suma częściowa</span>
+                  <span className="font-semibold text-brand-800">{formatPrice(cartItemTotal)}</span>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         <aside className="space-y-5 lg:sticky lg:top-8 lg:self-start">
@@ -88,15 +164,43 @@ const CartPage = () => {
             </div>
 
             <div className="p-6">
+              {carts.length > 1 && (
+                <div className="mb-5 space-y-2">
+                  {carts.map((cart, index) => {
+                    const colors = SELLER_COLORS[index % SELLER_COLORS.length];
+                    const total = cart.items.reduce(
+                      (sum, item) => sum + (item.product?.price ?? 0) * item.quantity,
+                      0
+                    );
+                    return (
+                      <div key={cart.id} className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-2">
+                          <span className={`inline-block h-2 w-2 rounded-full ${colors.bg}`} />
+                          <span className="text-gray-600">{cart.seller.username ?? `Sprzedawca #${index + 1}`}</span>
+                        </div>
+                        <span className="font-medium text-brand-800">{formatPrice(total)}</span>
+                      </div>
+                    );
+                  })}
+                  <div className="my-3 border-t border-brand-100" />
+                </div>
+              )}
+
               <dl className="divide-y divide-brand-50 rounded-xl border border-brand-100 bg-cream-50">
                 <div className="flex items-center justify-between px-4 py-2.5 text-sm">
-                  <dt className="text-gray-500">Produkty ({items.length})</dt>
+                  <dt className="text-gray-500">Produkty ({allItems.length})</dt>
                   <dd className="font-medium text-brand-800">{formatPrice(cartTotal)}</dd>
                 </div>
                 <div className="flex items-center justify-between px-4 py-2.5 text-sm">
                   <dt className="text-gray-500">Dostawa</dt>
                   <dd className="font-medium text-emerald-600">Bezpłatna</dd>
                 </div>
+                {carts.length > 1 && (
+                  <div className="flex items-center justify-between px-4 py-2.5 text-sm">
+                    <dt className="text-gray-500">Liczba zamówień</dt>
+                    <dd className="font-medium text-amber-600">{carts.length} osobne</dd>
+                  </div>
+                )}
                 <div className="flex items-center justify-between px-4 py-2.5 text-sm">
                   <dt className="text-gray-500">Czas dostawy</dt>
                   <dd className="font-medium text-brand-800">24–48 h</dd>
@@ -120,20 +224,6 @@ const CartPage = () => {
                   </span>
                 </Button>
               </Link>
-
-              <div className="mt-4 flex justify-center gap-4">
-                {[
-                  'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
-                  'M13 10V3L4 14h7v7l9-11h-7z',
-                  'M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z',
-                ].map((icon, i) => (
-                  <div key={i} className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-50 text-brand-400">
-                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={icon} />
-                    </svg>
-                  </div>
-                ))}
-              </div>
 
               <p className="mt-3 text-center text-xs text-gray-400">
                 Bezpieczne zakupy · Szyfrowane połączenie · Zwrot 14 dni

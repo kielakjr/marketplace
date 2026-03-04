@@ -410,18 +410,18 @@ const seed = async () => {
     ]);
     console.log(`Created ${products.length} products`);
 
-    const carts = await Cart.bulkCreate([
-      { user_id: users[1].id },
-      { user_id: users[2].id },
-    ]);
-    console.log(`Created ${carts.length} carts`);
+    // const carts = await Cart.bulkCreate([
+    //   { user_id: users[1].id },
+    //   { user_id: users[2].id },
+    // ]);
+    // console.log(`Created ${carts.length} carts`);
 
-    await CartItem.bulkCreate([
-      { cart_id: carts[0].id, product_id: products[0].id, quantity: 1 },
-      { cart_id: carts[0].id, product_id: products[2].id, quantity: 2 },
-      { cart_id: carts[1].id, product_id: products[4].id, quantity: 1 },
-    ]);
-    console.log(`Created 3 cart items`);
+    // await CartItem.bulkCreate([
+    //   { cart_id: carts[0].id, product_id: products[0].id, quantity: 1 },
+    //   { cart_id: carts[0].id, product_id: products[2].id, quantity: 2 },
+    //   { cart_id: carts[1].id, product_id: products[4].id, quantity: 1 },
+    // ]);
+    // console.log(`Created 3 cart items`);
 
     const orders = await Order.bulkCreate([
       {

@@ -2,8 +2,8 @@ import api from './axiosInstance';
 import type { Cart, CartItem, AddToCartPayload, UpdateCartItemPayload } from '@/types/cart';
 
 export const cartApi = {
-  getCart: () =>
-    api.get<Cart>('/cart').then((res) => res.data),
+  getCarts: () =>
+    api.get<Cart[]>('/cart').then((res) => res.data),
 
   addItem: (data: AddToCartPayload) =>
     api.post<CartItem>('/cart/items', data).then((res) => res.data),
@@ -14,6 +14,6 @@ export const cartApi = {
   removeItem: (itemId: string) =>
     api.delete(`/cart/items/${itemId}`).then((res) => res.data),
 
-  clearCart: () =>
-    api.delete('/cart').then((res) => res.data),
+  clearCart: (sellerId: string) =>
+    api.delete(`/cart/${sellerId}`).then((res) => res.data),
 };

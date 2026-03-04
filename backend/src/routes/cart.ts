@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {
-  getCart,
+  getAllCarts,
   addCartItem,
   updateCartItem,
   removeCartItem,
@@ -12,10 +12,10 @@ const router = Router();
 
 router.use(requireAuth);
 
-router.get("/", getCart);
+router.get("/", getAllCarts);
 router.post("/items", addCartItem);
 router.patch("/items/:itemId", updateCartItem);
 router.delete("/items/:itemId", removeCartItem);
-router.delete("/", clearCart);
+router.delete("/:sellerId", clearCart);
 
 export default router;

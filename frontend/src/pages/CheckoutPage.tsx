@@ -1,25 +1,32 @@
-import { useActionState, useRef } from 'react';
+import { useActionState, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 
-import { useCart, useCartTotal } from '@/hooks/useCart';
+import { useCarts, useCartTotal, cartKeys } from '@/hooks/useCart';
 import { useCreateOrder } from '@/hooks/useOrders';
-import { cartKeys } from '@/hooks/useCart';
 import { formatPrice } from '@/utils/formatPrice';
 
 import Spinner from '@/components/ui/Spinner';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 
+const SELLER_COLORS = [
+  { bg: 'bg-brand-800', light: 'bg-brand-50', border: 'border-brand-200', dot: 'bg-brand-500' },
+  { bg: 'bg-emerald-800', light: 'bg-emerald-50', border: 'border-emerald-200', dot: 'bg-emerald-500' },
+  { bg: 'bg-violet-800', light: 'bg-violet-50', border: 'border-violet-200', dot: 'bg-violet-500' },
+  { bg: 'bg-rose-800', light: 'bg-rose-50', border: 'border-rose-200', dot: 'bg-rose-500' },
+];
+
 const CheckoutPage = () => {
-  const { data: cart, isLoading } = useCart();
+  const { data: carts, isLoading } = useCarts();
   const cartTotal = useCartTotal();
   const createOrder = useCreateOrder();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const formRef = useRef<HTMLFormElement>(null);
+  const [activeCart, setActiveCart] = useState<number>(0);
 
-  const items = cart?.items ?? [];
+  const allItems = carts?.flatMap((c) => c.items) ?? [];
 
   const checkoutAction = async (_prev: string, formData: FormData) => {
     const street = (formData.get('street') as string).trim();
@@ -31,15 +38,17 @@ const CheckoutPage = () => {
       return 'Wszystkie pola adresu są wymagane.';
     }
 
-    if (items.length === 0) {
+    if (allItems.length === 0) {
       return 'Twój koszyk jest pusty.';
     }
 
     try {
-      await createOrder.mutateAsync({
-        items: items.map((item) => ({ product_id: item.product_id, quantity: item.quantity })),
-        address: { street, street_number: streetNumber, city, postal_code: postalCode },
-      });
+      for (const cart of carts ?? []) {
+        await createOrder.mutateAsync({
+          items: cart.items.map((item) => ({ product_id: item.product_id, quantity: item.quantity })),
+          address: { street, street_number: streetNumber, city, postal_code: postalCode },
+        });
+      }
       await queryClient.invalidateQueries({ queryKey: cartKeys.all });
       navigate('/dashboard/orders', { replace: true });
       return '';
@@ -57,7 +66,7 @@ const CheckoutPage = () => {
       </div>
     );
 
-  if (!cart || items.length === 0) {
+  if (!carts || allItems.length === 0) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 rounded-2xl border border-brand-100 bg-white p-12 text-center shadow-sm">
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-50">
@@ -79,16 +88,26 @@ const CheckoutPage = () => {
   return (
     <div className="space-y-8">
       <nav className="flex items-center gap-2 text-sm">
-        <button onClick={() => navigate('/products')} className="font-medium text-brand-500 transition hover:text-brand-800">
-          Produkty
-        </button>
+        <button onClick={() => navigate('/products')} className="font-medium text-brand-500 transition hover:text-brand-800">Produkty</button>
         <span className="text-brand-300">/</span>
-        <button onClick={() => navigate('/cart')} className="font-medium text-brand-500 transition hover:text-brand-800">
-          Koszyk
-        </button>
+        <button onClick={() => navigate('/cart')} className="font-medium text-brand-500 transition hover:text-brand-800">Koszyk</button>
         <span className="text-brand-300">/</span>
         <span className="font-medium text-brand-800">Zamówienie</span>
       </nav>
+
+      {carts.length > 1 && (
+        <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4">
+          <svg className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+          <div>
+            <p className="text-sm font-semibold text-amber-800">Zamówienie od {carts.length} sprzedawców</p>
+            <p className="mt-0.5 text-xs text-amber-700">
+              Zostanie złożonych {carts.length} osobnych zamówień. Jeden adres dostawy dla wszystkich.
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="grid gap-8 lg:grid-cols-[1fr_400px]">
         <div className="space-y-6">
@@ -96,6 +115,9 @@ const CheckoutPage = () => {
             <div className="bg-brand-800 px-6 py-4">
               <p className="text-xs font-semibold uppercase tracking-widest text-brand-300">Krok 1</p>
               <h2 className="mt-1 text-2xl font-bold text-white">Adres dostawy</h2>
+              {carts.length > 1 && (
+                <p className="mt-1 text-xs text-brand-300">Wspólny dla wszystkich {carts.length} zamówień</p>
+              )}
             </div>
 
             <form ref={formRef} action={formAction} className="p-6">
@@ -107,7 +129,6 @@ const CheckoutPage = () => {
                   {error}
                 </div>
               )}
-
               <div className="space-y-4">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                   <Input name="street" type="text" placeholder="Ulica" required className="sm:col-span-2" />
@@ -136,6 +157,73 @@ const CheckoutPage = () => {
             </form>
           </div>
 
+          <div className="overflow-hidden rounded-3xl border border-brand-200 bg-white shadow-md">
+            <div className="bg-brand-800 px-6 py-4">
+              <p className="text-xs font-semibold uppercase tracking-widest text-brand-300">Krok 2</p>
+              <h2 className="mt-1 text-2xl font-bold text-white">
+                {carts.length === 1 ? 'Twoje produkty' : `Zamówienia (${carts.length})`}
+              </h2>
+            </div>
+
+            {carts.length > 1 && (
+              <div className="flex gap-1 border-b border-gray-100 bg-gray-50 px-4 pt-3">
+                {carts.map((cart, index) => {
+                  const colors = SELLER_COLORS[index % SELLER_COLORS.length];
+                  return (
+                    <button
+                      key={cart.id}
+                      onClick={() => setActiveCart(index)}
+                      className={`flex items-center gap-2 rounded-t-xl border-b-2 px-4 py-2.5 text-sm font-medium transition ${
+                        activeCart === index
+                          ? `border-brand-600 text-brand-800`
+                          : 'border-transparent text-gray-500 hover:text-gray-700'
+                      }`}
+                    >
+                      <span className={`h-2 w-2 rounded-full ${colors.dot}`} />
+                      {cart.seller.username ?? `Sprzedawca ${index + 1}`}
+                      <span className="rounded-full bg-gray-200 px-1.5 py-0.5 text-xs text-gray-600">
+                        {cart.items.length}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            <div className="p-6">
+              {(() => {
+                const cart = carts[activeCart];
+                const cartItemTotal = cart.items.reduce(
+                  (sum, item) => sum + (item.product?.price ?? 0) * item.quantity,
+                  0
+                );
+                return (
+                  <div className="space-y-4">
+                    {cart.items.map((item) => (
+                      <div key={item.id} className="flex items-start justify-between gap-4">
+                        <div className="min-w-0">
+                          <p className="truncate font-semibold text-brand-800">{item.product?.name}</p>
+                          <p className="mt-0.5 text-sm text-gray-500">
+                            {item.quantity} szt. × {formatPrice(item.product?.price ?? 0)}
+                          </p>
+                        </div>
+                        <span className="shrink-0 font-semibold text-brand-800">
+                          {formatPrice((item.product?.price ?? 0) * item.quantity)}
+                        </span>
+                      </div>
+                    ))}
+                    {carts.length > 1 && (
+                      <div className="flex items-center justify-between border-t border-gray-100 pt-4 text-sm">
+                        <span className="text-gray-500">Suma tego zamówienia</span>
+                        <span className="font-semibold text-brand-800">{formatPrice(cartItemTotal)}</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+
           <div className="grid gap-4 sm:grid-cols-3">
             {[
               { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', title: 'Bezpieczna płatność', desc: 'Szyfrowane połączenie SSL.' },
@@ -160,38 +248,48 @@ const CheckoutPage = () => {
         <aside className="space-y-5 lg:sticky lg:top-8 lg:self-start">
           <div className="overflow-hidden rounded-3xl border border-brand-200 bg-white shadow-md">
             <div className="bg-brand-800 px-6 py-4">
-              <p className="text-xs font-semibold uppercase tracking-widest text-brand-300">Krok 2</p>
-              <h2 className="mt-1 text-2xl font-bold text-white">Twoje produkty</h2>
+              <p className="text-xs font-semibold uppercase tracking-widest text-brand-300">Krok 3</p>
+              <h2 className="mt-1 text-2xl font-bold text-white">Podsumowanie</h2>
             </div>
 
             <div className="p-6">
-              <div className="space-y-4">
-                {items.map((item) => (
-                  <div key={item.id} className="flex items-start justify-between gap-4">
-                    <div className="min-w-0">
-                      <p className="truncate font-semibold text-brand-800">{item.product?.name}</p>
-                      <p className="mt-0.5 text-sm text-gray-500">
-                        {item.quantity} szt. x {formatPrice(item.product?.price ?? 0)}
-                      </p>
-                    </div>
-                    <span className="shrink-0 font-semibold text-brand-800">
-                      {formatPrice((item.product?.price ?? 0) * item.quantity)}
-                    </span>
-                  </div>
-                ))}
-              </div>
+              {carts.length > 1 && (
+                <div className="mb-5 space-y-2">
+                  {carts.map((cart, index) => {
+                    const colors = SELLER_COLORS[index % SELLER_COLORS.length];
+                    const total = cart.items.reduce(
+                      (sum, item) => sum + (item.product?.price ?? 0) * item.quantity,
+                      0
+                    );
+                    return (
+                      <div key={cart.id} className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-2">
+                          <span className={`inline-block h-2 w-2 rounded-full ${colors.dot}`} />
+                          <span className="text-gray-600">{cart.seller.username ?? `Sprzedawca ${index + 1}`}</span>
+                        </div>
+                        <span className="font-medium text-brand-800">{formatPrice(total)}</span>
+                      </div>
+                    );
+                  })}
+                  <div className="my-3 border-t border-brand-100" />
+                </div>
+              )}
 
-              <div className="my-5 border-t border-brand-100" />
-
-              <dl className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <dt className="text-gray-500">Produkty ({items.length})</dt>
+              <dl className="divide-y divide-brand-50 rounded-xl border border-brand-100 bg-cream-50">
+                <div className="flex items-center justify-between px-4 py-2.5 text-sm">
+                  <dt className="text-gray-500">Produkty ({allItems.length})</dt>
                   <dd className="font-medium text-brand-800">{formatPrice(cartTotal)}</dd>
                 </div>
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center justify-between px-4 py-2.5 text-sm">
                   <dt className="text-gray-500">Dostawa</dt>
                   <dd className="font-medium text-emerald-600">Bezpłatna</dd>
                 </div>
+                {carts.length > 1 && (
+                  <div className="flex items-center justify-between px-4 py-2.5 text-sm">
+                    <dt className="text-gray-500">Zamówień</dt>
+                    <dd className="font-medium text-amber-600">{carts.length} osobne</dd>
+                  </div>
+                )}
               </dl>
 
               <div className="my-5 border-t border-brand-100" />
@@ -209,7 +307,7 @@ const CheckoutPage = () => {
                   className="w-full"
                   size="lg"
                   isLoading={isPending}
-                  disabled={items.length === 0 || isPending}
+                  disabled={allItems.length === 0 || isPending}
                   onClick={() => formRef.current?.requestSubmit()}
                 >
                   {isPending ? (
@@ -224,6 +322,12 @@ const CheckoutPage = () => {
                   )}
                 </Button>
               </label>
+
+              {carts.length > 1 && (
+                <p className="mt-2 text-center text-xs text-amber-600">
+                  Składasz {carts.length} osobne zamówienia jednocześnie
+                </p>
+              )}
 
               <p className="mt-3 text-center text-xs text-gray-400">
                 Kupując, akceptujesz{' '}

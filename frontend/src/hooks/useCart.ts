@@ -4,32 +4,47 @@ import type { AddToCartPayload, UpdateCartItemPayload } from '@/types/cart';
 import { useAppSelector } from '@/store/hooks';
 
 export const cartKeys = {
-  all: ['cart'] as const,
+  all: ['carts'] as const,
 };
 
-export function useCart() {
+export function useCarts() {
   const { isAuthenticated } = useAppSelector((state) => state.auth);
 
   return useQuery({
     queryKey: cartKeys.all,
-    queryFn: cartApi.getCart,
+    queryFn: cartApi.getCarts,
     enabled: isAuthenticated,
   });
 }
 
 export function useCartItemCount() {
-  const { data: cart } = useCart();
-  return cart?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
-}
-
-export function useCartTotal() {
-  const { data: cart } = useCart();
+  const { data: carts } = useCarts();
   return (
-    cart?.items.reduce(
-      (sum, item) => sum + (item.product?.price ?? 0) * item.quantity,
+    carts?.reduce(
+      (sum, cart) => sum + cart.items.reduce((s, item) => s + item.quantity, 0),
       0
     ) ?? 0
   );
+}
+
+export function useCartTotal() {
+  const { data: carts } = useCarts();
+  return (
+    carts?.reduce(
+      (sum, cart) =>
+        sum +
+        cart.items.reduce(
+          (s, item) => s + (item.product?.price ?? 0) * item.quantity,
+          0
+        ),
+      0
+    ) ?? 0
+  );
+}
+
+export function useSellerCart(sellerId: string) {
+  const { data: carts } = useCarts();
+  return carts?.find((cart) => cart.seller_id === sellerId);
 }
 
 export function useAddToCart() {
@@ -66,7 +81,7 @@ export function useRemoveCartItem() {
 export function useClearCart() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: () => cartApi.clearCart(),
+    mutationFn: (sellerId: string) => cartApi.clearCart(sellerId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: cartKeys.all });
     },

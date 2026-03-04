@@ -17,9 +17,14 @@ export interface CartItem {
 export interface Cart {
   id: string;
   user_id: string;
+  seller_id: string;
   items: CartItem[];
   createdAt: string;
   updatedAt: string;
+  seller: {
+    id: string;
+    username: string;
+  };
 }
 
 export interface AddToCartPayload {

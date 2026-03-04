@@ -7,15 +7,27 @@ interface CartProductAtrributes {
   quantity: number;
 }
 
-export async function getCart(req: Request, res: Response) {
+export async function getCart(req: Request<{ sellerId: string }>, res: Response) {
   try {
-    const cart = await CartService.getCart(req.user!.userId);
+    const cart = await CartService.getCart(req.user!.userId, req.params.sellerId);
     res.json(cart);
   } catch (error: unknown) {
     if (error instanceof Error) {
       return res.status(500).json({ error: error.message });
     }
     res.status(500).json({ error: "Failed to fetch cart" });
+  }
+}
+
+export async function getAllCarts(req: Request, res: Response) {
+  try {
+    const carts = await CartService.getAllCarts(req.user!.userId);
+    res.json(carts);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return res.status(500).json({ error: error.message });
+    }
+    res.status(500).json({ error: "Failed to fetch carts" });
   }
 }
 
@@ -80,9 +92,9 @@ export async function removeCartItem(req: Request<{ itemId: string }>, res: Resp
   }
 }
 
-export async function clearCart(req: Request, res: Response) {
+export async function clearCart(req: Request<{ sellerId: string }>, res: Response) {
   try {
-    await CartService.clearCart(req.user!.userId);
+    await CartService.clearCart(req.user!.userId, req.params.sellerId);
     res.status(204).send();
   } catch (error: unknown) {
     if (error instanceof Error) {

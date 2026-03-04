@@ -17,7 +17,7 @@ export class OrderService {
     try {
       let totalAmount = 0;
       const orderItemsData: { product_id: string; quantity: number; price_per_unit: number }[] = [];
-      const sellerIds = new Set<string>();
+      let sellerId: string | null = null;
 
       for (const item of items) {
         const product = await Product.findByPk(item.product_id, { transaction });
@@ -31,7 +31,7 @@ export class OrderService {
           throw new Error(`Cannot order your own product "${product.name}"`);
         }
 
-        sellerIds.add(product.user_id);
+        sellerId = product.user_id;
 
         const pricePerUnit = parseFloat(product.price.toString());
         totalAmount += pricePerUnit * item.quantity;
@@ -41,9 +41,6 @@ export class OrderService {
           price_per_unit: pricePerUnit,
         });
       }
-
-      // If all products come from the same seller, store seller_id directly on the order
-      const sellerId = sellerIds.size === 1 ? [...sellerIds][0] : null;
 
       const order = await Order.create(
         { buyer_id: userId, seller_id: sellerId, total_amount: totalAmount, status: "PENDING" },
@@ -82,9 +79,13 @@ export class OrderService {
         { transaction }
       );
 
-      const cart = await Cart.findOne({ where: { user_id: userId }, transaction });
+      const cart = await Cart.findOne({
+        where: { user_id: userId, seller_id: sellerId },
+        transaction,
+      });
       if (cart) {
         await CartItem.destroy({ where: { cart_id: cart.id }, transaction });
+        await Cart.destroy({ where: { id: cart.id }, transaction });
       }
 
       await transaction.commit();
