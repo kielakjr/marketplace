@@ -16,6 +16,7 @@ import AdminPanelPage from '@/pages/admin/AdminPanelPage';
 import AdminCategories from '@/pages/admin/AdminCategories';
 import AdminUsers from '@/pages/admin/AdminUsers';
 import AdminOrders from '@/pages/admin/AdminOrders';
+import AdminOrderDetail from '@/pages/admin/AdminOrderDetail';
 import NotFoundPage from '@/pages/NotFoundPage';
 import OrdersPage from '@/pages/OrdersPage';
 import OrderDetailPage from '@/pages/OrderDetailPage';
@@ -69,6 +70,7 @@ export const router = createBrowserRouter([
               { path: 'categories', element: <AdminCategories /> },
               { path: 'users', element: <AdminUsers /> },
               { path: 'orders', element: <AdminOrders /> },
+              { path: 'orders/:id', element: <AdminOrderDetail /> },
             ],
           },
         ],

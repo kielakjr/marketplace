@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { register } from '@/store/slices/authSlice';
+import { Link } from 'react-router';
+import { useAppSelector } from '@/store/hooks';
+import { useAuth } from '@/hooks/useAuth';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 
@@ -18,40 +18,30 @@ const RegisterPage = () => {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<FieldErrors>({});
 
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
+  const { register } = useAuth();
   const { isLoading } = useAppSelector((state) => state.auth);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setErrors({});
 
-    const result = await dispatch(register({ username, email, password }));
+    const result = await register({ username, email, password });
 
-    if (register.fulfilled.match(result)) {
-      navigate('/', { replace: true });
-      return;
-    }
+    if ('error' in result) {
+      const payload = (result as any).payload;
 
-    if (register.rejected.match(result) && result.payload?.error) {
-      const issues = result.payload.error;
-
-      const fieldErrors: FieldErrors = {};
-
-      for (const issue of issues) {
-        const field = issue.path?.[0] as keyof FieldErrors;
-        if (field) {
-          fieldErrors[field] = issue.message;
+      if (payload?.error && Array.isArray(payload.error)) {
+        const fieldErrors: FieldErrors = {};
+        for (const issue of payload.error) {
+          const field = issue.path?.[0] as keyof FieldErrors;
+          if (field) fieldErrors[field] = issue.message;
         }
+        setErrors(fieldErrors);
+        return;
       }
 
-      setErrors(fieldErrors);
-      return;
+      setErrors({ general: 'Rejestracja nie powiodła się. Spróbuj ponownie.' });
     }
-
-    setErrors({
-      general: 'Rejestracja nie powiodła się. Spróbuj ponownie.',
-    });
   };
 
   return (

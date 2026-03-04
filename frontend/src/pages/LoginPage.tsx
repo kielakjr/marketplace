@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { login } from '@/store/slices/authSlice';
+import { Link, useLocation } from 'react-router';
+import { useAppSelector } from '@/store/hooks';
+import { useAuth } from '@/hooks/useAuth';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 
@@ -10,21 +10,18 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
+  const { login } = useAuth();
   const location = useLocation();
   const { isLoading } = useAppSelector((state) => state.auth);
 
-  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/';
+  const from = (location.state as { from?: { pathname: string } })?.from?.pathname;
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
 
-    const result = await dispatch(login({ email, password }));
-    if (login.fulfilled.match(result)) {
-      navigate(from, { replace: true });
-    } else {
+    const result = await login({ email, password }, from);
+    if (result && 'error' in result) {
       setError('Nieprawidłowy email lub hasło');
     }
   };
