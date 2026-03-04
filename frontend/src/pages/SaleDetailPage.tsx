@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router';
-import { useSale } from '@/hooks/useOrders';
+import { useSale, useSentOrder } from '@/hooks/useOrders';
 import { formatPrice } from '@/utils/formatPrice';
 import { orderStatusLabels, orderStatusVariant, paymentStatusLabels, deliveryStatusLabels } from '@/utils/orderStatus';
 import Spinner from '@/components/ui/Spinner';
@@ -9,6 +9,7 @@ import Button from '@/components/ui/Button';
 const SaleDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const { data: order, isLoading, isError } = useSale(id!);
+  const sentOrderMutation = useSentOrder();
 
   if (isLoading)
     return (
@@ -259,8 +260,8 @@ const SaleDetailPage = () => {
               {canShip && (
                 <Button
                   className="mt-4 w-full"
-                  onClick={() => {}}
-                  isLoading={false}
+                  onClick={() => sentOrderMutation.mutate(order.delivery!.id)}
+                  isLoading={sentOrderMutation.isPending}
                 >
                   <span className="flex items-center gap-2">
                     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

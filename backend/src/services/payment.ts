@@ -2,7 +2,7 @@ import { Payment, Order } from "../models";
 
 export class PaymentService {
   static async getByOrderId(orderId: string, userId: string) {
-    const order = await Order.findOne({ where: { id: orderId, user_id: userId } });
+    const order = await Order.findOne({ where: { id: orderId, buyer_id: userId } });
     if (!order) throw new Error("Order not found");
 
     const payment = await Payment.findOne({ where: { order_id: orderId } });
@@ -11,7 +11,7 @@ export class PaymentService {
   }
 
   static async processPayment(orderId: string, userId: string, paymentGatewayId?: string) {
-    const order = await Order.findOne({ where: { id: orderId, user_id: userId } });
+    const order = await Order.findOne({ where: { id: orderId, buyer_id: userId } });
     if (!order) throw new Error("Order not found");
     if (order.status === "CANCELLED") throw new Error("Cannot pay for cancelled order");
 

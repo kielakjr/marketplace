@@ -62,7 +62,7 @@ const AdminOrderDetail = () => {
   return (
     <div className="space-y-8">
       <nav className="flex items-center gap-2 text-sm">
-        <Link to="/dashboard/admin/orders" className="font-medium text-brand-500 transition hover:text-brand-800">
+        <Link to="/admin/orders" className="font-medium text-brand-500 transition hover:text-brand-800">
           Zamówienia
         </Link>
         <span className="text-brand-300">/</span>

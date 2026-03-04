@@ -60,6 +60,17 @@ export function usePayOrder() {
   });
 }
 
+export function useSentOrder() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => ordersApi.sentOrder(id),
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: orderKeys.seller() });
+      queryClient.invalidateQueries({ queryKey: orderKeys.saleDetail(id) });
+    },
+  });
+}
+
 export function useSellerOrders() {
   const { isAuthenticated } = useAppSelector((state) => state.auth);
   return useQuery({

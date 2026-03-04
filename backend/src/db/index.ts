@@ -4,7 +4,7 @@ import { User, Product, Order, OrderItem, Payment, Delivery, Category, CartItem,
 
 const sequelize = new Sequelize(env.DATABASE_URL, {
   dialect: 'postgres',
-  logging: console.log,
+  logging: false,
   models: [User, Product, Order, OrderItem, Payment, Delivery, Category, Cart, CartItem, Address],
 });
 

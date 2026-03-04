@@ -23,6 +23,9 @@ export const ordersApi = {
   getSaleById: (id: string) =>
     api.get<OrderDetailed>(`/orders/seller/${id}`).then((res) => res.data),
 
+  sentOrder: (id: string) =>
+    api.patch<Order>(`/deliveries/${id}/sent`).then((res) => res.data),
+
   adminGetAll: () =>
     api.get<OrderDetailed[]>('/orders/admin/all').then((res) => res.data),
 

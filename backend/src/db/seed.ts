@@ -416,45 +416,42 @@ const seed = async () => {
     ]);
     console.log(`Created ${carts.length} carts`);
 
-    const cartItems = await CartItem.bulkCreate([
-      {
-        cart_id: carts[0].id,
-        product_id: products[0].id,
-        quantity: 1,
-      },
-      {
-        cart_id: carts[0].id,
-        product_id: products[2].id,
-        quantity: 2,
-      },
-      {
-        cart_id: carts[1].id,
-        product_id: products[4].id,
-        quantity: 1,
-      },
+    await CartItem.bulkCreate([
+      { cart_id: carts[0].id, product_id: products[0].id, quantity: 1 },
+      { cart_id: carts[0].id, product_id: products[2].id, quantity: 2 },
+      { cart_id: carts[1].id, product_id: products[4].id, quantity: 1 },
     ]);
-    console.log(`Created ${cartItems.length} cart items`);
+    console.log(`Created 3 cart items`);
 
     const orders = await Order.bulkCreate([
       {
-        user_id: users[1].id,
-        total_amount: 6148.00,
+        buyer_id: users[1].id,
+        seller_id: users[3].id,
+        total_amount: 11798.00,
         status: "COMPLETED",
       },
       {
-        user_id: users[2].id,
-        total_amount: 2628.00,
+        buyer_id: users[2].id,
+        seller_id: users[1].id,
+        total_amount: 3998.00,
         status: "PROCESSING",
       },
       {
-        user_id: users[1].id,
-        total_amount: 89.00,
+        buyer_id: users[2].id,
+        seller_id: users[3].id,
+        total_amount: 2699.00,
         status: "PENDING",
+      },
+      {
+        buyer_id: users[1].id,
+        seller_id: null,
+        total_amount: 6398.00,
+        status: "PROCESSING",
       },
     ]);
     console.log(`Created ${orders.length} orders`);
 
-    const orderItems = await OrderItem.bulkCreate([
+    await OrderItem.bulkCreate([
       {
         order_id: orders[0].id,
         product_id: products[0].id,
@@ -463,53 +460,71 @@ const seed = async () => {
       },
       {
         order_id: orders[0].id,
-        product_id: products[4].id,
+        product_id: products[1].id,
         quantity: 1,
-        price_per_unit: 649.00,
+        price_per_unit: 6299.00,
       },
       {
         order_id: orders[1].id,
+        product_id: products[2].id,
+        quantity: 1,
+        price_per_unit: 1499.00,
+      },
+      {
+        order_id: orders[1].id,
+        product_id: products[5].id,
+        quantity: 1,
+        price_per_unit: 2499.00,
+      },
+      {
+        order_id: orders[2].id,
+        product_id: products[25].id,
+        quantity: 1,
+        price_per_unit: 2699.00,
+      },
+      {
+        order_id: orders[3].id,
+        product_id: products[0].id,
+        quantity: 1,
+        price_per_unit: 5499.00,
+      },
+      {
+        order_id: orders[3].id,
         product_id: products[3].id,
         quantity: 1,
         price_per_unit: 899.00,
       },
-      {
-        order_id: orders[1].id,
-        product_id: products[8].id,
-        quantity: 2,
-        price_per_unit: 129.00,
-      },
-      {
-        order_id: orders[2].id,
-        product_id: products[9].id,
-        quantity: 1,
-        price_per_unit: 89.00,
-      },
     ]);
-    console.log(`Created ${orderItems.length} order items`);
+    console.log(`Created 7 order items`);
 
-    const payments = await Payment.bulkCreate([
+    await Payment.bulkCreate([
       {
         order_id: orders[0].id,
-        amount: 6148.00,
+        amount: 11798.00,
         status: "PAID",
         payment_gateway_id: "pay_completed_12345",
       },
       {
         order_id: orders[1].id,
-        amount: 2628.00,
+        amount: 3998.00,
         status: "PAID",
         payment_gateway_id: "pay_processing_67890",
       },
       {
         order_id: orders[2].id,
-        amount: 89.00,
+        amount: 2699.00,
         status: "PENDING",
       },
+      {
+        order_id: orders[3].id,
+        amount: 6398.00,
+        status: "PAID",
+        payment_gateway_id: "pay_mixed_11111",
+      },
     ]);
-    console.log(`Created ${payments.length} payments`);
+    console.log(`Created 4 payments`);
 
-    const deliveries = await Delivery.bulkCreate([
+    await Delivery.bulkCreate([
       {
         order_id: orders[0].id,
         address_id: addresses[0].id,
@@ -527,13 +542,20 @@ const seed = async () => {
         address_id: addresses[2].id,
         status: "PREPARING",
       },
+      {
+        order_id: orders[3].id,
+        address_id: addresses[0].id,
+        status: "SHIPPED",
+        tracking_number: "PL555444333222",
+      },
     ]);
-    console.log(`Created ${deliveries.length} deliveries`);
+    console.log(`Created 4 deliveries`);
 
     console.log("\nDatabase seeded successfully!");
     console.log("\nTest credentials:");
-    console.log("   Admin: admin@marketplace.pl / Password123!");
-    console.log("   User:  jan@example.pl / Password123!");
+    console.log("   Admin:  admin@marketplace.pl / Password123!");
+    console.log("   Buyer:  jan@example.pl / Password123!");
+    console.log("   Seller: piotr@example.pl / Password123!");
 
     process.exit(0);
   } catch (error) {

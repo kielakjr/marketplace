@@ -3,6 +3,7 @@ import { PaymentService } from "../services/payment";
 import { updatePaymentSchema } from "../validation/payment";
 
 export async function processPayment(req: Request<{ orderId: string }>, res: Response) {
+  console.log("Processing payment for order", req.params.orderId, "by user", req.user!.userId);
   try {
     const payment = await PaymentService.processPayment(
       req.params.orderId,
