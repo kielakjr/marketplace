@@ -6,6 +6,7 @@ import ProductCard from '@/components/ProductCard';
 import Spinner from '@/components/ui/Spinner';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
+import Pagination from '@/components/Pagination';
 
 const ProductsPage = () => {
   const [search, setSearch] = useState('');
@@ -15,6 +16,7 @@ const ProductsPage = () => {
   const [sortBy, setSortBy] = useState<'price' | 'createdAt' | undefined>(undefined);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [showFilters, setShowFilters] = useState(false);
+  const [page, setPage] = useState(1);
 
   const debouncedSearch = useDebounce(search, 500);
   const debouncedMinPrice = useDebounce(minPrice, 500);
@@ -27,9 +29,12 @@ const ProductsPage = () => {
     maxPrice: debouncedMaxPrice,
     sortBy,
     sortOrder,
+    page,
+    limit: 12,
   });
 
   const products = productsData?.data || [];
+  const pagination = productsData?.pagination;
 
   const { data: categories, isLoading: isCategoriesLoading, isError: isCategoriesError } = useCategories();
 
@@ -143,6 +148,11 @@ const ProductsPage = () => {
           ))}
         </div>
       )}
+      <Pagination
+        currentPage={pagination?.page || 1}
+        totalPages={pagination?.totalPages || 1}
+        onPageChange={(newPage) => setPage(newPage)}
+      />
     </div>
   );
 };

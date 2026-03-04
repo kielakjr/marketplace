@@ -9,7 +9,7 @@ export class ProductService {
     };
 
     if (filters?.name) {
-      where.name = { [Op.like]: `%${filters.name}%` };
+      where.name = { [Op.iLike]: `%${filters.name}%` };
     }
 
     if (filters?.categoryId) {
