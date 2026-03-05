@@ -14,7 +14,7 @@ const CartItem = ({ item }: CartItemProps) => {
   if (!product) return null;
 
   return (
-    <div className="flex items-center gap-4 rounded-xl border border-brand-200 bg-white p-4">
+    <div className="flex flex-col md:flex-row items-center gap-4 rounded-xl border border-brand-200 bg-white p-4">
       <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-cream-50">
         {product.image_url ? (
           <img src={product.image_url} alt={product.name} className="h-full w-full object-cover" />

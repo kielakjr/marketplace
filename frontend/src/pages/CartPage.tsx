@@ -95,7 +95,7 @@ const CartPage = () => {
         </div>
       )}
 
-      <div className="grid gap-8 lg:grid-cols-[1fr_400px]">
+      <div className="grid gap-8 grid-cols-1 lg:grid-cols-[1fr_400px]">
         <div className="space-y-6">
           {carts.map((cart, index) => {
             const colors = SELLER_COLORS[index % SELLER_COLORS.length];
@@ -106,9 +106,9 @@ const CartPage = () => {
             const cartItemCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
 
             return (
-              <div key={cart.id} className={`overflow-hidden rounded-3xl border ${colors.border} bg-white shadow-md`}>
+              <div key={cart.id} className={`overflow-hidden rounded-3xl border ${colors.border} bg-white shadow-md w-full`}>
                 <div className={`${colors.bg} px-6 py-4`}>
-                  <div className="flex items-center justify-between gap-4">
+                  <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
                       <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15">
                         <svg className="h-4.5 w-4.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -120,7 +120,7 @@ const CartPage = () => {
                         <p className="font-semibold text-white">{cart.seller.username ?? `Sprzedawca #${index + 1}`}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-col md:flex-row items-center gap-3">
                       <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white">
                         {cartItemCount} szt. · {formatPrice(cartItemTotal)}
                       </span>

@@ -109,7 +109,7 @@ const CheckoutPage = () => {
         </div>
       )}
 
-      <div className="grid gap-8 lg:grid-cols-[1fr_400px]">
+      <div className="grid gap-8 grid-cols-1 lg:grid-cols-[1fr_400px]">
         <div className="space-y-6">
           <div className="overflow-hidden rounded-3xl border border-brand-200 bg-white shadow-md">
             <div className="bg-brand-800 px-6 py-4">
