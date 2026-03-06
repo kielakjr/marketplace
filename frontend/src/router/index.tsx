@@ -23,6 +23,7 @@ import OrderDetailPage from '@/pages/OrderDetailPage';
 import SaleDetailPage from '@/pages/SaleDetailPage';
 import CheckoutPage from '@/pages/CheckoutPage';
 import SalesPage from '@/pages/SalesPage';
+import ProfilePage from '@/pages/ProfilePage';
 
 export const router = createBrowserRouter([
   {
@@ -49,6 +50,7 @@ export const router = createBrowserRouter([
               { path: 'sales/:id', element: <SaleDetailPage /> },
             ],
           },
+          { path: 'profile', element: <ProfilePage /> },
         ],
       },
 

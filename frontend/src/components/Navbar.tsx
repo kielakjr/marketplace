@@ -54,7 +54,9 @@ const Navbar = () => {
           {isAuthenticated ? (
             <>
               <NavLink to="/dashboard" className={linkClass}>Panel</NavLink>
-              <span className="text-sm text-brand-500 font-medium">{user?.username}</span>
+              <Link to="/profile" className="text-sm text-brand-500 font-medium">
+                {user?.username}
+              </Link>
               <button
                 onClick={handleLogout}
                 className="rounded-lg border border-brand-200 bg-cream-50 px-4 py-2 text-sm font-medium text-brand-800 transition-colors hover:bg-brand-100"
