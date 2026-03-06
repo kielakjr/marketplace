@@ -144,10 +144,11 @@ const ProductDetailPage = () => {
                     </div>
                     <div className="min-w-0">
                       <p className="text-xs font-medium uppercase tracking-wide text-brand-400">Sprzedawca</p>
-                      <p className="mt-0.5 truncate font-semibold text-brand-800">{product.seller.username}</p>
+                      <Link to={`/profile/${product.seller.id}`} className="mt-0.5 truncate font-semibold text-brand-800">
+                        {product.seller.username}
+                      </Link>
                     </div>
                   </div>
-                  <p className="mt-3 truncate text-sm text-gray-500">{product.seller.email}</p>
                 </div>
               )}
             </div>
