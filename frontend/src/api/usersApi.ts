@@ -1,5 +1,5 @@
 import api from './axiosInstance';
-import type { User, LoginPayload, RegisterPayload, UsersData, UsersFilters } from '@/types/user';
+import type { User, LoginPayload, RegisterPayload, UsersData, UsersFilters, UserWithProducts } from '@/types/user';
 
 export interface AuthResponse {
   user: User;
@@ -22,7 +22,7 @@ export const usersApi = {
     api.get<UsersData>('/users', { params: filters }).then((res) => res.data),
 
   getById: (id: string) =>
-    api.get<User>(`/users/${id}`).then((res) => res.data),
+    api.get<UserWithProducts>(`/users/${id}`).then((res) => res.data),
 
   create: (data: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) =>
     api.post<User>('/users', data).then((res) => res.data),

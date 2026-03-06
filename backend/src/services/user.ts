@@ -1,4 +1,4 @@
-import { User } from '../models'
+import { Product, User } from '../models'
 import { Op } from 'sequelize';
 import bcrypt from 'bcrypt';
 import { UserCreationAttributes, UserUpdateAttributes, UserFilters } from '../dto/user';
@@ -42,7 +42,13 @@ export class UserService {
 }
 
   static async getUserById(id: string) {
-    return User.findByPk(id);
+    return User.findByPk(id, {
+      attributes: { exclude: ['password_hash'] },
+      include: [{
+        model: Product,
+        as: 'products',
+      }],
+    });
   }
 
   static async createUser(data: UserCreationAttributes) {

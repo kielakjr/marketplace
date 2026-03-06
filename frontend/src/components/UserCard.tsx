@@ -1,5 +1,6 @@
 import type { User } from '@/types/user';
 import { useUserToggleRole, useUserDelete } from '@/hooks/useUsers';
+import Avatar from '@/components/ui/Avatar';
 
 interface Props {
   user: User;
@@ -22,9 +23,7 @@ export default function UserCard({ user, onEdit }: Props) {
     <div className="overflow-hidden rounded-2xl border border-brand-100 bg-white shadow-sm transition hover:shadow-md">
       <div className="flex items-center justify-between border-b border-brand-50 px-5 py-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-800 text-base font-bold text-white">
-            {user.username.charAt(0).toUpperCase()}
-          </div>
+          <Avatar username={user.username} size={12} />
           <div className="min-w-0">
             <p className="truncate font-semibold text-brand-800">{user.username}</p>
             <p className="truncate text-sm text-gray-500">{user.email}</p>

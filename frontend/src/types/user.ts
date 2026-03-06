@@ -1,3 +1,5 @@
+import type { Product } from './product';
+
 export interface User {
   id: string;
   username: string;
@@ -5,6 +7,10 @@ export interface User {
   role: 'USER' | 'ADMIN';
   createdAt: string;
   updatedAt: string;
+}
+
+export interface UserWithProducts extends User {
+  products: Product[];
 }
 
 export interface UsersData {
