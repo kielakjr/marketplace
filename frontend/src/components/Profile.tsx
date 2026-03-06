@@ -3,15 +3,22 @@ import ProductCard from '@/components/ProductCard'
 import Avatar from '@/components/ui/Avatar'
 import StatCard from '@/components/ui/StatCard'
 import { howLong } from '@/utils/date'
+import { useUserProducts } from '@/hooks/useProducts'
+import Pagination from './Pagination'
+import { useState } from 'react'
 
 const Skeleton = ({ className = '' }: { className?: string }) => (
   <div className={`animate-pulse bg-brand-200/60 rounded-xl ${className}`} />
 )
 
 const Profile = ({ userId }: { userId: string }) => {
-  const { data: userData, isLoading, isError } = useUser(userId)
-
-  if (isLoading) {
+  const [page, setPage] = useState(1);
+  const { data: userData, isLoading: isUserLoading, isError: isUserError } = useUser(userId);
+  const { data: productsData, isLoading: isProductsLoading, isError: isProductsError} = useUserProducts(userId, {
+    limit: 8,
+    page
+  });
+  if (isUserLoading) {
     return (
       <div className="min-h-screen bg-cream-50 p-6 flex items-start justify-center">
         <div className="w-full max-w-4xl space-y-4 pt-10">
@@ -25,7 +32,7 @@ const Profile = ({ userId }: { userId: string }) => {
     )
   }
 
-  if (isError || !userData) {
+  if (isUserError || !userData) {
     return (
       <div className="min-h-screen bg-cream-50 flex items-center justify-center">
         <div className="text-center space-y-3">
@@ -42,7 +49,7 @@ const Profile = ({ userId }: { userId: string }) => {
     )
   }
 
-  const products = userData.products ?? []
+  const products = productsData?.data || [];
   const joinDate = new Date(userData.createdAt).toLocaleDateString('pl-PL', {
     year: 'numeric', month: 'long', day: 'numeric',
   })
@@ -97,7 +104,7 @@ const Profile = ({ userId }: { userId: string }) => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
               <StatCard
                 label="Produkty"
-                value={String(products.length)}
+                value={String(productsData?.pagination.total)}
                 icon={
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round"
@@ -130,22 +137,23 @@ const Profile = ({ userId }: { userId: string }) => {
           </div>
         </div>
 
-        {products.length > 0 ? (
+        {!isProductsLoading && !isProductsError && products.length > 0 ? (
           <div className="bg-white rounded-2xl border border-brand-100 shadow-sm p-6">
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-2.5">
                 <h2 className="text-brand-900 font-bold text-lg tracking-tight">Produkty</h2>
                 <span className="text-xs font-semibold bg-brand-50 text-brand-500 px-2.5 py-1 rounded-full border border-brand-100">
-                  {products.length}
+                  {productsData?.pagination.total}
                 </span>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-3">
               {products.map(p => (
                 <ProductCard key={p.id} product={p} />
               ))}
             </div>
+            <Pagination currentPage={page} totalPages={productsData!.pagination.totalPages} onPageChange={newpage => setPage(newpage)}/>
           </div>
         ) : (
           <div className="bg-white rounded-2xl border border-brand-100 shadow-sm p-14 text-center">

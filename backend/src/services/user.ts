@@ -44,10 +44,6 @@ export class UserService {
   static async getUserById(id: string) {
     return User.findByPk(id, {
       attributes: { exclude: ['password_hash'] },
-      include: [{
-        model: Product,
-        as: 'products',
-      }],
     });
   }
 

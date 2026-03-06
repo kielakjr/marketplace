@@ -30,7 +30,7 @@ const HomePage = () => {
                 Przeglądaj produkty
               </Button>
             </Link>
-            <Link to="/register">
+            <Link to="/dashboard/my-products">
               <Button variant="ghost" size="lg" className="border border-white/30 text-white hover:bg-white/10">
                 Zacznij sprzedawać
               </Button>
