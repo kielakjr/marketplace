@@ -75,7 +75,7 @@ const Profile = ({ userId, isMy = false }: { userId: string, isMy?: boolean }) =
           <div className="px-7 pb-6">
 
             <div className="flex items-end flex-wrap gap-4 -mt-7">
-              <Avatar username={userData.username} />
+              <Avatar username={userData.username} size={22} />
 
               <div className="pb-1 min-w-0 flex-1">
                 <h1 className="text-2xl font-bold text-brand-900 leading-tight mb-1.5">
