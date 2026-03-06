@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, useTransition } from 'react';
 import { useCreateProduct, useUpdateProduct } from '@/hooks/useProducts';
 import { useCategories } from '@/hooks/useCategories';
 import type { Product } from '@/types/product';
@@ -17,30 +17,27 @@ const ProductForm = ({ product, onSuccess }: ProductFormProps) => {
   const { user } = useAppSelector((state) => state.auth);
   const isEditing = !!product;
 
-  const [name, setName] = useState(product?.name ?? '');
-  const [description, setDescription] = useState(product?.description ?? '');
-  const [imageUrl, setImageUrl] = useState(product?.image_url ?? '');
-  const [price, setPrice] = useState(product?.price?.toString() ?? '');
-  const [quantity, setQuantity] = useState(product?.quantity_available?.toString() ?? '');
-  const [categoryId, setCategoryId] = useState(product?.category_id?.toString() ?? '');
   const [error, setError] = useState('');
+  const [isPending, startTransition] = useTransition();
 
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
   const { data: categories, isLoading: categoriesLoading } = useCategories();
-
-  const isPending = createProduct.isPending || updateProduct.isPending;
 
   const categoryOptions = (categories ?? []).map((c) => ({
     value: c.id,
     label: c.name,
   }));
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setError('');
+  const handleAction = (formData: FormData) => {
+    const name = (formData.get('name') as string).trim();
+    const description = (formData.get('description') as string).trim();
+    const imageUrl = (formData.get('imageUrl') as string).trim();
+    const price = formData.get('price') as string;
+    const quantity = formData.get('quantity') as string;
+    const categoryId = formData.get('categoryId') as string;
 
-    if (!name.trim()) {
+    if (!name) {
       setError('Nazwa produktu jest wymagana');
       return;
     }
@@ -53,30 +50,36 @@ const ProductForm = ({ product, onSuccess }: ProductFormProps) => {
       return;
     }
 
+    setError('');
+
     const payload = {
-      name: name.trim(),
-      description: description.trim() || undefined,
-      image_url: imageUrl.trim() || undefined,
+      name,
+      description: description || undefined,
+      image_url: imageUrl || undefined,
       price: parseFloat(price),
       quantity_available: parseInt(quantity) || 0,
       category_id: parseInt(categoryId),
-      user_id: user!.id
+      user_id: user!.id,
     };
 
-    try {
-      if (isEditing && product) {
-        await updateProduct.mutateAsync({ id: product.id, data: payload });
-      } else {
-        await createProduct.mutateAsync(payload);
+    startTransition(async () => {
+      try {
+        if (isEditing && product) {
+          await updateProduct.mutateAsync({ id: product.id, data: payload });
+        } else {
+          await createProduct.mutateAsync(payload);
+        }
+        onSuccess();
+      } catch {
+        setError(isEditing ? 'Nie udało się zaktualizować produktu' : 'Nie udało się dodać produktu');
       }
-      onSuccess();
-    } catch {
-      setError(isEditing ? 'Nie udało się zaktualizować produktu' : 'Nie udało się dodać produktu');
-    }
+    });
   };
 
+  const [imageUrlPreview, setImageUrlPreview] = useState(product?.image_url ?? '');
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form action={handleAction} className="space-y-4">
       {error && (
         <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
           {error}
@@ -85,35 +88,36 @@ const ProductForm = ({ product, onSuccess }: ProductFormProps) => {
 
       <Input
         id="product-name"
+        name="name"
         label="Nazwa produktu"
         placeholder="np. Słuchawki bezprzewodowe"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
+        defaultValue={product?.name ?? ''}
         required
       />
 
       <Textarea
         id="product-description"
+        name="description"
         label="Opis"
         placeholder="Opisz swój produkt..."
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
+        defaultValue={product?.description ?? ''}
         rows={3}
       />
 
       <Input
         id="product-image"
+        name="imageUrl"
         label="URL zdjęcia"
         type="url"
         placeholder="https://example.com/photo.jpg"
-        value={imageUrl}
-        onChange={(e) => setImageUrl(e.target.value)}
+        defaultValue={product?.image_url ?? ''}
+        onChange={(e) => setImageUrlPreview(e.target.value)}
       />
 
-      {imageUrl && (
+      {imageUrlPreview && (
         <div className="h-32 w-32 overflow-hidden rounded-lg border border-brand-200 bg-cream-50">
           <img
-            src={imageUrl}
+            src={imageUrlPreview}
             alt="Podgląd"
             className="h-full w-full object-cover"
             onError={(e) => {
@@ -126,35 +130,35 @@ const ProductForm = ({ product, onSuccess }: ProductFormProps) => {
       <div className="grid grid-cols-2 gap-4">
         <Input
           id="product-price"
+          name="price"
           label="Cena (PLN)"
           type="number"
           step="0.01"
           min="0.01"
           placeholder="0.00"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
+          defaultValue={product?.price?.toString() ?? ''}
           required
         />
 
         <Input
           id="product-quantity"
+          name="quantity"
           label="Ilość dostępna"
           type="number"
           min="0"
           step="1"
           placeholder="0"
-          value={quantity}
-          onChange={(e) => setQuantity(e.target.value)}
+          defaultValue={product?.quantity_available?.toString() ?? ''}
           required
         />
       </div>
 
       <Select
         id="product-category"
+        name="categoryId"
         label="Kategoria"
         placeholder="Wybierz kategorię..."
-        value={categoryId}
-        onChange={(e) => setCategoryId(e.target.value)}
+        defaultValue={product?.category_id?.toString() ?? ''}
         options={categoryOptions}
         disabled={categoriesLoading}
         required
