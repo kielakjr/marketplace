@@ -219,7 +219,7 @@ const ProductDetailPage = () => {
                   { label: 'Dostawa', value: '24-48 h' },
                   { label: 'Zwrot', value: '14 dni' },
                   { label: 'Dodano', value: createdAt },
-                  ...(product.seller ? [{ label: 'Sprzedawca', value: product.seller.username }] : []),
+                  ...(product.seller ? [{ label: 'Sprzedawca', value: <Link to={`/profile/${product.seller.id}`}>{product.seller.username}</Link> }] : []),
                 ].map(({ label, value }) => (
                   <div key={label} className="flex items-center justify-between px-4 py-2.5 text-sm">
                     <dt className="text-gray-500">{label}</dt>

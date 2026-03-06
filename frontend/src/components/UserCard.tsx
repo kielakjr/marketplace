@@ -1,6 +1,7 @@
 import type { User } from '@/types/user';
 import { useUserToggleRole, useUserDelete } from '@/hooks/useUsers';
 import Avatar from '@/components/ui/Avatar';
+import { Link } from 'react-router';
 
 interface Props {
   user: User;
@@ -25,7 +26,7 @@ export default function UserCard({ user, onEdit }: Props) {
         <div className="flex items-center gap-3">
           <Avatar username={user.username} size={12} />
           <div className="min-w-0">
-            <p className="truncate font-semibold text-brand-800">{user.username}</p>
+            <Link to={`/profile/${user.id}`} className="truncate font-semibold text-brand-800">{user.username}</Link>
             <p className="truncate text-sm text-gray-500">{user.email}</p>
           </div>
         </div>

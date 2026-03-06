@@ -117,7 +117,7 @@ const CartPage = () => {
                       </div>
                       <div>
                         <p className="text-xs font-semibold uppercase tracking-widest text-white/60">Sprzedawca</p>
-                        <p className="font-semibold text-white">{cart.seller.username ?? `Sprzedawca #${index + 1}`}</p>
+                        <Link to={`/profile/${cart.seller_id}`} className="font-semibold text-white">{cart.seller.username}</Link>
                       </div>
                     </div>
                     <div className="flex flex-col md:flex-row items-center gap-3">
@@ -176,7 +176,7 @@ const CartPage = () => {
                       <div key={cart.id} className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-2">
                           <span className={`inline-block h-2 w-2 rounded-full ${colors.bg}`} />
-                          <span className="text-gray-600">{cart.seller.username ?? `Sprzedawca #${index + 1}`}</span>
+                          <Link to={`/profile/${cart.seller_id}`} className="text-gray-600">{cart.seller.username}</Link>
                         </div>
                         <span className="font-medium text-brand-800">{formatPrice(total)}</span>
                       </div>

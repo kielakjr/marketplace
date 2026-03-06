@@ -1,6 +1,7 @@
 import type { CartItem as CartItemType } from '@/types/cart';
 import { useUpdateCartItem, useRemoveCartItem } from '@/hooks/useCart';
 import { formatPrice } from '@/utils/formatPrice';
+import { Link } from 'react-router'
 
 interface CartItemProps {
   item: CartItemType;
@@ -24,10 +25,10 @@ const CartItem = ({ item }: CartItemProps) => {
           </div>
         )}
       </div>
-      <div className="flex-1">
+      <Link to={`/products/${product.id}`} className="flex-1">
         <h3 className="font-medium text-gray-900">{product.name}</h3>
         <p className="text-sm text-brand-800 font-semibold">{formatPrice(product.price)}</p>
-      </div>
+      </Link>
       <div className="flex items-center gap-2">
         <button
           onClick={() =>
