@@ -6,12 +6,13 @@ import { howLong } from '@/utils/date'
 import { useUserProducts } from '@/hooks/useProducts'
 import Pagination from './Pagination'
 import { useState } from 'react'
+import Spinner from './ui/Spinner'
 
 const Skeleton = ({ className = '' }: { className?: string }) => (
   <div className={`animate-pulse bg-brand-200/60 rounded-xl ${className}`} />
 )
 
-const Profile = ({ userId }: { userId: string }) => {
+const Profile = ({ userId, isMy = false }: { userId: string, isMy?: boolean }) => {
   const [page, setPage] = useState(1);
   const { data: userData, isLoading: isUserLoading, isError: isUserError } = useUser(userId);
   const { data: productsData, isLoading: isProductsLoading, isError: isProductsError} = useUserProducts(userId, {
@@ -137,6 +138,14 @@ const Profile = ({ userId }: { userId: string }) => {
           </div>
         </div>
 
+        {isProductsLoading && <Spinner size="md"/>}
+
+        {isProductsError && (
+          <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center text-red-600">
+            Nie udało się załadować produktów.
+          </div>
+        )}
+
         {!isProductsLoading && !isProductsError && products.length > 0 ? (
           <div className="bg-white rounded-2xl border border-brand-100 shadow-sm p-6">
             <div className="flex items-center justify-between mb-5">
@@ -164,7 +173,9 @@ const Profile = ({ userId }: { userId: string }) => {
               </svg>
             </div>
             <p className="text-brand-800 font-semibold text-base">Brak produktów</p>
-            <p className="text-brand-500 text-sm mt-1">Dodaj swój pierwszy produkt, aby zacząć sprzedawać.</p>
+            { isMy &&
+              <p className="text-brand-500 text-sm mt-1">Dodaj swój pierwszy produkt, aby zacząć sprzedawać.</p>
+            }
           </div>
         )}
 

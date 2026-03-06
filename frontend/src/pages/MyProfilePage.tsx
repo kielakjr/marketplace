@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuth'
 const MyProfilePage = () => {
   const { user } = useAuth()
   return (
-    <Profile userId={user!.id} />
+    <Profile userId={user!.id} isMy />
   )
 }
 

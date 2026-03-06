@@ -9,11 +9,18 @@ import Badge from '@/components/ui/Badge';
 import Modal from '@/components/ui/Modal';
 import ProductForm from '@/components/ProductForm';
 import type { Product } from '@/types/product';
+import Pagination from '@/components/Pagination';
 
 const MyProductsPage = () => {
+  const [page, setPage] = useState(1);
   const { user } = useAppSelector((state) => state.auth);
-  const { data: myProducts, isLoading } = useUserProducts(user!.id);
+  const { data: products, isLoading } = useUserProducts(user!.id, {
+    limit: 3,
+    page
+  });
   const deleteProduct = useDeleteProduct();
+
+  const myProducts = products?.data
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -162,6 +169,7 @@ const MyProductsPage = () => {
               </div>
             </Card>
           ))}
+          <Pagination totalPages={products!.pagination.totalPages} onPageChange={newpage => setPage(newpage)} currentPage={page}/>
         </div>
       )}
 
