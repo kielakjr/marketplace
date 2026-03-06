@@ -8,8 +8,8 @@ export const productsApi = {
   getById: (id: string) =>
     api.get<ProductWithCategoryAndSeller>(`/products/${id}`).then((res) => res.data),
 
-  getUserProducts: (userId: string) =>
-    api.get<Product[]>(`/products/user/${userId}`).then((res) => res.data),
+  getUserProducts: (userId: string, filters?: ProductFilters) =>
+    api.get<ProductsData>(`/products/user/${userId}`, { params: filters}).then((res) => res.data),
 
   create: (data: ProductCreationPayload) =>
     api.post<Product>('/products', data).then((res) => res.data),

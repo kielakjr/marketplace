@@ -119,7 +119,9 @@ const AdminOrderDetail = () => {
             <dl className="divide-y divide-brand-50 rounded-xl border border-brand-100 bg-cream-50">
               <div className="flex items-center justify-between px-4 py-2.5 text-sm">
                 <dt className="text-gray-500">Nazwa użytkownika</dt>
-                <dd className="font-medium text-brand-800">{order.buyer.username}</dd>
+                <dd className="font-medium text-brand-800">
+                  <Link to={`/profile/${order.buyer.id}`} className="mt-0.5 truncate font-semibold text-brand-800">{order.buyer.username}</Link>
+                </dd>
               </div>
               <div className="flex items-center justify-between px-4 py-2.5 text-sm">
                 <dt className="text-gray-500">E-mail</dt>
@@ -149,7 +151,9 @@ const AdminOrderDetail = () => {
               <dl className="divide-y divide-brand-50 rounded-xl border border-brand-100 bg-cream-50">
                 <div className="flex items-center justify-between px-4 py-2.5 text-sm">
                   <dt className="text-gray-500">Nazwa użytkownika</dt>
-                  <dd className="font-medium text-brand-800">{order.seller.username}</dd>
+                  <dd className="font-medium text-brand-800">
+                    <Link to={`/profile/${order.seller.id}`} className="mt-0.5 truncate font-semibold text-brand-800">{order.seller.username}</Link>
+                  </dd>
                 </div>
                 <div className="flex items-center justify-between px-4 py-2.5 text-sm">
                   <dt className="text-gray-500">E-mail</dt>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useProducts } from '@/hooks/useProducts';
 import { useCategories } from '@/hooks/useCategories';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -32,6 +32,10 @@ const ProductsPage = () => {
     page,
     limit: 12,
   });
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, categoryId, debouncedMinPrice, debouncedMaxPrice, sortBy, sortOrder]);
 
   const products = productsData?.data || [];
   const pagination = productsData?.pagination;

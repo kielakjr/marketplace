@@ -1,5 +1,5 @@
 import { useActionState, useRef, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, Link } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { useCarts, useCartTotal, cartKeys } from '@/hooks/useCart';
@@ -180,7 +180,7 @@ const CheckoutPage = () => {
                       }`}
                     >
                       <span className={`h-2 w-2 rounded-full ${colors.dot}`} />
-                      {cart.seller.username ?? `Sprzedawca ${index + 1}`}
+                        {cart.seller.username}
                       <span className="rounded-full bg-gray-200 px-1.5 py-0.5 text-xs text-gray-600">
                         {cart.items.length}
                       </span>
@@ -204,7 +204,7 @@ const CheckoutPage = () => {
                         <div className="min-w-0">
                           <p className="truncate font-semibold text-brand-800">{item.product?.name}</p>
                           <p className="mt-0.5 text-sm text-gray-500">
-                            {item.quantity} szt. × {formatPrice(item.product?.price ?? 0)}
+                            {item.quantity} szt. x {formatPrice(item.product?.price ?? 0)}
                           </p>
                         </div>
                         <span className="shrink-0 font-semibold text-brand-800">
@@ -265,7 +265,7 @@ const CheckoutPage = () => {
                       <div key={cart.id} className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-2">
                           <span className={`inline-block h-2 w-2 rounded-full ${colors.dot}`} />
-                          <span className="text-gray-600">{cart.seller.username ?? `Sprzedawca ${index + 1}`}</span>
+                          <Link to={`/profile/${cart.seller_id}`} className="text-gray-600">{cart.seller.username}</Link>
                         </div>
                         <span className="font-medium text-brand-800">{formatPrice(total)}</span>
                       </div>

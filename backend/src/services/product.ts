@@ -58,10 +58,49 @@ export class ProductService {
       }) as ProductDTO | null;
   }
 
-  static async getUserProducts(userId: string) {
-    return Product.findAll({ where: {
-      user_id: userId
-    }})
+  static async getUserProducts(userId: string, filters?: Partial<ProductFilters>) {
+    const where: any = {
+      user_id: userId,
+    };
+
+    if (filters?.name) {
+      where.name = { [Op.iLike]: `%${filters.name}%` };
+    }
+
+    if (filters?.categoryId) {
+      where.category_id = filters.categoryId;
+    }
+
+    if (filters?.minPrice && !filters?.maxPrice) {
+      where.price = { [Op.gte]: filters.minPrice };
+    } else if (!filters?.minPrice && filters?.maxPrice) {
+      where.price = { [Op.lte]: filters.maxPrice };
+    } else if (filters?.minPrice && filters?.maxPrice) {
+      where.price = { [Op.between]: [filters.minPrice, filters.maxPrice] };
+    }
+
+    const sortBy = filters?.sortBy ?? 'createdAt';
+    const sortOrder = filters?.sortOrder ?? 'asc';
+    const limit = filters?.limit ?? 20;
+    const page = filters?.page ?? 1;
+    const offset = (page - 1) * limit;
+
+    const { rows: products, count: total } = await Product.findAndCountAll({
+      where,
+      order: [[sortBy, sortOrder]],
+      limit,
+      offset,
+    });
+
+    return {
+      data: products,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   static async createProduct(data: Partial<Product>) {

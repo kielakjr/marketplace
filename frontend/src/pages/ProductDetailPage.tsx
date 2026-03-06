@@ -144,10 +144,11 @@ const ProductDetailPage = () => {
                     </div>
                     <div className="min-w-0">
                       <p className="text-xs font-medium uppercase tracking-wide text-brand-400">Sprzedawca</p>
-                      <p className="mt-0.5 truncate font-semibold text-brand-800">{product.seller.username}</p>
+                      <Link to={`/profile/${product.seller.id}`} className="mt-0.5 truncate font-semibold text-brand-800">
+                        {product.seller.username}
+                      </Link>
                     </div>
                   </div>
-                  <p className="mt-3 truncate text-sm text-gray-500">{product.seller.email}</p>
                 </div>
               )}
             </div>
@@ -218,7 +219,7 @@ const ProductDetailPage = () => {
                   { label: 'Dostawa', value: '24-48 h' },
                   { label: 'Zwrot', value: '14 dni' },
                   { label: 'Dodano', value: createdAt },
-                  ...(product.seller ? [{ label: 'Sprzedawca', value: product.seller.username }] : []),
+                  ...(product.seller ? [{ label: 'Sprzedawca', value: <Link to={`/profile/${product.seller.id}`}>{product.seller.username}</Link> }] : []),
                 ].map(({ label, value }) => (
                   <div key={label} className="flex items-center justify-between px-4 py-2.5 text-sm">
                     <dt className="text-gray-500">{label}</dt>

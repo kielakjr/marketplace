@@ -23,6 +23,8 @@ import OrderDetailPage from '@/pages/OrderDetailPage';
 import SaleDetailPage from '@/pages/SaleDetailPage';
 import CheckoutPage from '@/pages/CheckoutPage';
 import SalesPage from '@/pages/SalesPage';
+import MyProfilePage from '@/pages/MyProfilePage';
+import ProfilePage from '@/pages/ProfilePage';
 
 export const router = createBrowserRouter([
   {
@@ -48,6 +50,13 @@ export const router = createBrowserRouter([
               { path: 'sales', element: <SalesPage /> },
               { path: 'sales/:id', element: <SaleDetailPage /> },
             ],
+          },
+          {
+            path: 'profile',
+            children: [
+              { index: true, element: <MyProfilePage /> },
+              { path: ':id', element: <ProfilePage /> },
+            ]
           },
         ],
       },

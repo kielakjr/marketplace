@@ -18,10 +18,10 @@ export function useProducts(filters?: ProductFilters) {
   });
 }
 
-export function useUserProducts(userId: string) {
+export function useUserProducts(userId: string, filters?: ProductFilters) {
   return useQuery({
-    queryKey: productKeys.user,
-    queryFn: () => productsApi.getUserProducts(userId),
+    queryKey: [...productKeys.user, userId, filters],
+    queryFn: () => productsApi.getUserProducts(userId, filters),
   });
 }
 

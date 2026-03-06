@@ -9,7 +9,7 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   const addToCart = useAddToCart();
 
   const handleAddToCart = () => {
@@ -51,13 +51,15 @@ const ProductCard = ({ product }: ProductCardProps) => {
             ? `Dostępnych: ${product.quantity_available}`
             : 'Brak w magazynie'}
         </p>
-        <button
-          onClick={handleAddToCart}
-          disabled={product.quantity_available === 0 || addToCart.isPending}
-          className="mt-3 w-full rounded-lg bg-brand-800 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-gray-300"
-        >
-          {addToCart.isPending ? 'Dodawanie...' : 'Dodaj do koszyka'}
-        </button>
+        { user?.id !== product.user_id ? (
+          <button
+            onClick={handleAddToCart}
+            disabled={product.quantity_available === 0 || addToCart.isPending}
+            className="mt-3 w-full rounded-lg bg-brand-800 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+          >
+            {addToCart.isPending ? 'Dodawanie...' : 'Dodaj do koszyka'}
+          </button>
+        ) : <span className="mt-3 inline-block text-xs font-medium text-brand-500">Twój produkt</span> }
       </div>
     </div>
   );
