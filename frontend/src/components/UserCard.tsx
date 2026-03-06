@@ -24,7 +24,7 @@ export default function UserCard({ user, onEdit }: Props) {
     <div className="overflow-hidden rounded-2xl border border-brand-100 bg-white shadow-sm transition hover:shadow-md">
       <div className="flex items-center justify-between border-b border-brand-50 px-5 py-4">
         <div className="flex items-center gap-3">
-          <Avatar username={user.username} size={12} />
+          <Avatar username={user.username} size="md" />
           <div className="min-w-0">
             <Link to={`/profile/${user.id}`} className="truncate font-semibold text-brand-800">{user.username}</Link>
             <p className="truncate text-sm text-gray-500">{user.email}</p>
