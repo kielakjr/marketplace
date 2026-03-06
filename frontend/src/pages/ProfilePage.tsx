@@ -3,6 +3,7 @@ import { useUser } from '@/hooks/useUsers'
 import ProductCard from '@/components/ProductCard'
 import Avatar from '@/components/ui/Avatar'
 import StatCard from '@/components/ui/StatCard'
+import { howLong } from '@/utils/date'
 
 const Skeleton = ({ className = '' }: { className?: string }) => (
   <div className={`animate-pulse bg-brand-200/60 rounded-xl ${className}`} />
@@ -118,7 +119,7 @@ const ProfilePage = () => {
               />
               <StatCard
                 label="Na platformie"
-                value="2 lata"
+                value={howLong(new Date(userData.createdAt))}
                 icon={
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round"
