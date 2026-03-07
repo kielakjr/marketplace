@@ -115,6 +115,7 @@ export class OrderService {
       include: [
         { model: Product, through: { attributes: ["quantity", "price_per_unit"] } },
         { model: User, as: "buyer", attributes: ["id", "username", "email"] },
+        { model: User, as: "seller", attributes: ["id", "username", "email"] },
         { model: Payment, as: "payment" },
         { model: Delivery, as: "delivery", include: [{ model: Address, as: "address" }] },
       ],

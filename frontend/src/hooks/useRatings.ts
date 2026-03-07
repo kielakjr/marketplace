@@ -1,6 +1,7 @@
   import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
   import { ratingsApi } from '@/api/ratingsApi';
   import type { SubmitRatingPayload } from '@/types/rating';
+  import { userKeys } from './useUsers';
 
   export const ratingKeys = {
     userRatings: (userId: string) => ['ratings', 'user', userId] as const,
@@ -20,6 +21,7 @@
       mutationFn: (data: SubmitRatingPayload) => ratingsApi.submitRating(data),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ratingKeys.userRatings(sellerId) });
+        queryClient.invalidateQueries({ queryKey: userKeys.detail(sellerId) });
       },
     });
   }

@@ -12,7 +12,7 @@ export class UserRatingService {
   ): Promise<UserRating> {
 
     const order = await Order.findOne({
-      where: { id: orderId, user_id: reviewerId }
+      where: { id: orderId, buyer_id: reviewerId }
     });
 
     if (!order) throw new Error('Order not found or unauthorized');

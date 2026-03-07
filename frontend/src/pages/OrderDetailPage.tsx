@@ -100,6 +100,21 @@ const OrderDetailPage = () => {
               <dt className="text-gray-500">Łączna kwota</dt>
               <dd className="text-base font-extrabold text-brand-800">{formatPrice(parseFloat(order.total_amount.toString()))}</dd>
             </div>
+            <div className="flex items-center justify-between px-4 py-2.5 text-sm">
+                  <dt className="text-gray-500">Sprzedawca</dt>
+                  <dd>
+                    {order.seller ? (
+                      <Link
+                        to={`/profile/${order.seller.id}`}
+                        className="font-medium text-brand-600 hover:text-brand-800 hover:underline transition-colors"
+                      >
+                        {order.seller.username}
+                      </Link>
+                    ) : (
+                      <span className="text-brand-400">—</span>
+                    )}
+                  </dd>
+            </div>
           </dl>
         </div>
       </div>
