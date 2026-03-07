@@ -32,7 +32,6 @@ const ProductForm = ({ product, onSuccess }: ProductFormProps) => {
   const handleAction = (formData: FormData) => {
     const name = (formData.get('name') as string).trim();
     const description = (formData.get('description') as string).trim();
-    const imageUrl = (formData.get('imageUrl') as string).trim();
     const price = formData.get('price') as string;
     const quantity = formData.get('quantity') as string;
     const categoryId = formData.get('categoryId') as string;
@@ -55,7 +54,7 @@ const ProductForm = ({ product, onSuccess }: ProductFormProps) => {
     const payload = {
       name,
       description: description || undefined,
-      image_url: imageUrl || undefined,
+      image_urls: imageUrls.map((u) => u.trim()).filter(Boolean),
       price: parseFloat(price),
       quantity_available: parseInt(quantity) || 0,
       category_id: parseInt(categoryId),
@@ -76,7 +75,14 @@ const ProductForm = ({ product, onSuccess }: ProductFormProps) => {
     });
   };
 
-  const [imageUrlPreview, setImageUrlPreview] = useState(product?.image_url ?? '');
+  const [imageUrls, setImageUrls] = useState<string[]>(
+    product?.image_urls?.length ? product.image_urls : ['']
+  );
+
+  const addImageUrl = () => setImageUrls((prev) => [...prev, '']);
+  const removeImageUrl = (i: number) => setImageUrls((prev) => prev.filter((_, idx) => idx !== i));
+  const updateImageUrl = (i: number, val: string) =>
+    setImageUrls((prev) => prev.map((url, idx) => (idx === i ? val : url)));
 
   return (
     <form action={handleAction} className="space-y-4">
@@ -104,28 +110,55 @@ const ProductForm = ({ product, onSuccess }: ProductFormProps) => {
         rows={3}
       />
 
-      <Input
-        id="product-image"
-        name="imageUrl"
-        label="URL zdjęcia"
-        type="url"
-        placeholder="https://example.com/photo.jpg"
-        defaultValue={product?.image_url ?? ''}
-        onChange={(e) => setImageUrlPreview(e.target.value)}
-      />
-
-      {imageUrlPreview && (
-        <div className="h-32 w-32 overflow-hidden rounded-lg border border-brand-200 bg-cream-50">
-          <img
-            src={imageUrlPreview}
-            alt="Podgląd"
-            className="h-full w-full object-cover"
-            onError={(e) => {
-              (e.target as HTMLImageElement).style.display = 'none';
-            }}
-          />
-        </div>
-      )}
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-brand-700">Zdjęcia (URL)</label>
+        {imageUrls.map((url, i) => (
+          <div key={i} className="space-y-1">
+            <div className="flex items-center gap-2">
+              <input
+                type="url"
+                value={url}
+                onChange={(e) => updateImageUrl(i, e.target.value)}
+                placeholder="https://example.com/photo.jpg"
+                className="flex-1 rounded-lg border border-brand-200 bg-white px-3 py-2 text-sm text-brand-800 placeholder-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-400"
+              />
+              {imageUrls.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeImageUrl(i)}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-red-200 text-red-500 hover:bg-red-50"
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+            {url && (
+              <div className="h-20 w-20 overflow-hidden rounded-lg border border-brand-200 bg-cream-50">
+                <img
+                  src={url}
+                  alt="Podgląd"
+                  className="h-full w-full object-cover"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+              </div>
+            )}
+          </div>
+        ))}
+        {imageUrls.length < 8 && (
+          <button
+            type="button"
+            onClick={addImageUrl}
+            className="flex items-center gap-1.5 text-sm font-medium text-brand-600 hover:text-brand-800"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Dodaj zdjęcie
+          </button>
+        )}
+      </div>
 
       <div className="grid grid-cols-2 gap-4">
         <Input

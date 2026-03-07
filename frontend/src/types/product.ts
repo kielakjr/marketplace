@@ -1,7 +1,7 @@
 export interface Product {
   id: string;
   name: string;
-  image_url?: string;
+  image_urls: string[];
   description?: string;
   price: number;
   quantity_available: number;
@@ -36,7 +36,7 @@ export interface ProductWithCategoryAndSeller extends Product {
 
 export interface ProductCreationPayload {
   name: string;
-  image_url?: string;
+  image_urls?: string[];
   description?: string;
   price: number;
   quantity_available: number;
@@ -45,7 +45,7 @@ export interface ProductCreationPayload {
 
 export interface ProductUpdatePayload {
   name?: string;
-  image_url?: string;
+  image_urls?: string[];
   description?: string;
   price?: number;
   quantity_available?: number;

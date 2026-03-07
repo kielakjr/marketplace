@@ -154,8 +154,8 @@ const SaleDetailPage = () => {
           {order.products.map((product) => (
             <div key={product.id} className="flex items-center gap-4 py-4">
               <div className="h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-brand-100 bg-cream-50">
-                {product.image_url ? (
-                  <img src={product.image_url} alt={product.name} className="h-full w-full object-cover" />
+                {product.image_urls[0] ? (
+                  <img src={product.image_urls[0]} alt={product.name} className="h-full w-full object-cover" />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center">
                     <svg className="h-5 w-5 text-brand-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">

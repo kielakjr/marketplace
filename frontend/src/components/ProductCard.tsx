@@ -24,9 +24,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
     <div className="group overflow-hidden rounded-2xl border border-brand-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-brand-400">
       <Link to={`/products/${product.id}`}>
         <div className="aspect-square overflow-hidden bg-cream-50">
-          {product.image_url ? (
+          {product.image_urls[0] ? (
             <img
-              src={product.image_url}
+              src={product.image_urls[0]}
               alt={product.name}
               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             />

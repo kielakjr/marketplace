@@ -21,10 +21,11 @@ export class Product extends Model {
   name!: string;
 
   @Column({
-    type: DataType.STRING(255),
-    allowNull: true,
+    type: DataType.ARRAY(DataType.TEXT),
+    allowNull: false,
+    defaultValue: [],
   })
-  image_url?: string;
+  image_urls!: string[];
 
   @Column({
     type: DataType.TEXT,
