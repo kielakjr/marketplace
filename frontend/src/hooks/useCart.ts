@@ -14,6 +14,7 @@ export function useCarts() {
     queryKey: cartKeys.all,
     queryFn: cartApi.getCarts,
     enabled: isAuthenticated,
+    staleTime: 0,
   });
 }
 

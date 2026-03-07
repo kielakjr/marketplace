@@ -8,7 +8,7 @@ export class CartService {
       {
         model: CartItem,
         as: "items",
-        include: [{ model: Product, as: "product", attributes: ["id", "name", "image_url", "price", "quantity_available"] }],
+        include: [{ model: Product, as: "product", attributes: ["id", "name", "image_urls", "price", "quantity_available"] }],
       },
       {
         model: User,
@@ -30,7 +30,7 @@ export class CartService {
               {
                 model: Product,
                 as: "product",
-                attributes: ["id", "name", "image_url", "price", "quantity_available"],
+                attributes: ["id", "name", "image_urls", "price", "quantity_available"],
               },
             ],
         },
@@ -55,7 +55,7 @@ export class CartService {
               {
                 model: Product,
                 as: "product",
-                attributes: ["id", "name", "image_url", "price", "quantity_available"],
+                attributes: ["id", "name", "image_urls", "price", "quantity_available"],
               },
             ],
           },
@@ -144,7 +144,7 @@ export class CartService {
         {
           model: Product,
           as: "product",
-          attributes: ["id", "name", "image_url", "price", "quantity_available"],
+          attributes: ["id", "name", "image_urls", "price", "quantity_available"],
         },
       ],
     });
