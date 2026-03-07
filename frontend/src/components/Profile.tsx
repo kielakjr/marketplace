@@ -7,10 +7,47 @@ import { useUserProducts } from '@/hooks/useProducts'
 import Pagination from './Pagination'
 import { useState } from 'react'
 import Spinner from './ui/Spinner'
+import { useUserRatings } from '@/hooks/useRatings'
+import StarRating from './ui/StarRating'
 
 const Skeleton = ({ className = '' }: { className?: string }) => (
   <div className={`animate-pulse bg-brand-200/60 rounded-xl ${className}`} />
 )
+
+  const RatingsList = ({ userId }: { userId: string }) => {
+    const { data: ratings, isLoading } = useUserRatings(userId);
+
+    if (isLoading) return <div className="p-6"><Spinner size="md" /></div>;
+
+    if (!ratings || ratings.length === 0) {
+      return (
+        <div className="p-10 text-center text-brand-400 text-sm">
+          Brak ocen.
+        </div>
+      );
+    }
+
+    return (
+      <div className="divide-y divide-brand-50">
+        {ratings.map((r) => (
+          <div key={r.id} className="px-6 py-4">
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold text-brand-800">{r.reviewer.username}</span>
+                <StarRating value={r.rating} size="sm" />
+              </div>
+              <span className="text-xs text-brand-400">
+                {new Date(r.createdAt).toLocaleDateString('pl-PL')}
+              </span>
+            </div>
+            {r.comment && (
+              <p className="text-sm text-brand-600 mt-1">{r.comment}</p>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
 
 const Profile = ({ userId, isMy = false }: { userId: string, isMy?: boolean }) => {
   const [page, setPage] = useState(1);
@@ -115,7 +152,9 @@ const Profile = ({ userId, isMy = false }: { userId: string, isMy?: boolean }) =
               />
               <StatCard
                 label="Ocena"
-                value="4.9 / 5.0"
+                value={userData.avg_rating != null
+                  ? `${Number(userData.avg_rating).toFixed(2)} / 5.0`
+                  : '—'}
                 icon={
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round"
@@ -178,6 +217,18 @@ const Profile = ({ userId, isMy = false }: { userId: string, isMy?: boolean }) =
             }
           </div>
         )}
+
+        <div className="bg-white rounded-2xl border border-brand-100 shadow-sm mt-3">
+          <div className="flex items-center gap-2.5 px-6 py-4 border-b border-brand-100">
+            <h2 className="text-brand-900 font-bold text-lg tracking-tight">Oceny</h2>
+            {userData.ratings_count > 0 && (
+              <span className="text-xs font-semibold bg-brand-50 text-brand-500 px-2.5 py-1 rounded-full border border-brand-100">
+                {userData.ratings_count}
+              </span>
+            )}
+          </div>
+          <RatingsList userId={userId} />
+        </div>
 
       </div>
     </div>
