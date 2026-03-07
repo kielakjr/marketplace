@@ -13,6 +13,7 @@ const ProductDetailPage = () => {
   const { data: product, isLoading, isError } = useProduct(id!);
   const { isAuthenticated } = useAppSelector((state) => state.auth);
   const addToCart = useAddToCart();
+  const [selectedImage, setSelectedImage] = useState(0);
 
   const handleAddToCart = () => {
     if (!isAuthenticated) {
@@ -56,7 +57,6 @@ const ProductDetailPage = () => {
     );
   }
 
-  const [selectedImage, setSelectedImage] = useState(0);
   const inStock = product.quantity_available > 0;
   const createdAt = new Date(product.createdAt).toLocaleDateString('pl-PL', {
     day: 'numeric',
