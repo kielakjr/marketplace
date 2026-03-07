@@ -13,6 +13,7 @@ import categoryRoutes from "./routes/categories";
 import orderRoutes from "./routes/orders";
 import deliveryRoutes from "./routes/deliveries";
 import paymentRoutes from "./routes/payments";
+import userRatingRoutes from "./routes/userRatings";
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use("/categories", categoryRoutes);
 app.use("/orders", orderRoutes);
 app.use("/deliveries", deliveryRoutes);
 app.use("/payments", paymentRoutes);
+app.use("/ratings", userRatingRoutes);
 
 const initialize = async () => {
   try {
