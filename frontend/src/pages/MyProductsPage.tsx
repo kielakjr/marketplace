@@ -132,8 +132,8 @@ const MyProductsPage = () => {
           {filteredProducts.map((product) => (
             <Card key={product.id} className="flex flex-col gap-4 sm:flex-row sm:items-center">
               <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-cream-50">
-                {product.image_url ? (
-                  <img src={product.image_url} alt={product.name} className="h-full w-full object-cover" />
+                {product.image_urls[0] ? (
+                  <img src={product.image_urls[0]} alt={product.name} className="h-full w-full object-cover" />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-brand-300">
                     <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">

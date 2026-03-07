@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useParams, Link } from 'react-router';
 import { useProduct } from '@/hooks/useProducts';
 import { useAddToCart } from '@/hooks/useCart';
@@ -55,6 +56,7 @@ const ProductDetailPage = () => {
     );
   }
 
+  const [selectedImage, setSelectedImage] = useState(0);
   const inStock = product.quantity_available > 0;
   const createdAt = new Date(product.createdAt).toLocaleDateString('pl-PL', {
     day: 'numeric',
@@ -80,23 +82,44 @@ const ProductDetailPage = () => {
 
       <div className="grid gap-8 lg:grid-cols-[1fr_400px]">
         <div className="space-y-6">
-          <div className="overflow-hidden rounded-3xl border border-brand-100 bg-cream-50 shadow-sm">
-            <div className="aspect-4/3 w-full">
-              {product.image_url ? (
-                <img
-                  src={product.image_url}
-                  alt={product.name}
-                  className="h-full w-full object-cover transition duration-500 hover:scale-105"
-                />
-              ) : (
-                <div className="flex h-full w-full flex-col items-center justify-center gap-3 text-brand-200">
-                  <svg className="h-24 w-24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={0.8} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <span className="text-sm font-medium text-brand-300">Brak zdjęcia</span>
-                </div>
-              )}
+          <div className="space-y-3">
+            <div className="overflow-hidden rounded-3xl border border-brand-100 bg-cream-50 shadow-sm">
+              <div className="aspect-4/3 w-full">
+                {product.image_urls[selectedImage] ? (
+                  <img
+                    src={product.image_urls[selectedImage]}
+                    alt={product.name}
+                    className="h-full w-full object-cover transition duration-500 hover:scale-105"
+                  />
+                ) : (
+                  <div className="flex h-full w-full flex-col items-center justify-center gap-3 text-brand-200">
+                    <svg className="h-24 w-24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={0.8} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span className="text-sm font-medium text-brand-300">Brak zdjęcia</span>
+                  </div>
+                )}
+              </div>
             </div>
+
+            {product.image_urls.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {product.image_urls.map((url, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setSelectedImage(i)}
+                    className={`h-16 w-16 shrink-0 overflow-hidden rounded-xl border-2 transition ${
+                      selectedImage === i
+                        ? 'border-brand-600'
+                        : 'border-brand-100 hover:border-brand-300'
+                    }`}
+                  >
+                    <img src={url} alt={`${product.name} ${i + 1}`} className="h-full w-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="rounded-2xl border border-brand-100 bg-white p-6 shadow-sm">

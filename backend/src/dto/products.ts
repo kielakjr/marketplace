@@ -12,6 +12,7 @@ export interface ProductFilters {
 export interface ProductDTO {
   id: string;
   name: string;
+  image_urls: string[];
   description: string;
   price: number;
   quantity_available: number;

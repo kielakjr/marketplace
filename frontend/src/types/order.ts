@@ -3,7 +3,7 @@ export type OrderStatus = 'PENDING' | 'PROCESSING' | 'SHIPPED' | 'COMPLETED' | '
 export interface OrderItemProduct {
   id: string;
   name: string;
-  image_url?: string;
+  image_urls: string[];
   price: number;
   OrderItem: {
     quantity: number;
