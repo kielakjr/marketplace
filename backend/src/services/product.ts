@@ -3,9 +3,10 @@ import { Op } from 'sequelize';
 import { ProductFilters, ProductDTO } from '../dto/products';
 
 export class ProductService {
-  static async getProducts(filters?: Partial<ProductFilters>) {
+  static async getProducts(filters?: Partial<ProductFilters>, userId?: string) {
     const where: any = {
       quantity_available: { [Op.gt]: 0 },
+      user_id: { [Op.ne]: userId },
     };
 
     if (filters?.name) {

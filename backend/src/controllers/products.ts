@@ -70,7 +70,7 @@ export async function getProducts(req: Request<{}, {}, {}, ProductFilters>, res:
       filters.page = page;
     }
 
-    const products = await ProductService.getProducts(filters);
+    const products = await ProductService.getProducts(filters, req.user ? req.user.userId : undefined);
     res.json(products);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch products' });
