@@ -40,7 +40,7 @@ app.use("/ratings", userRatingRoutes);
 
 const initialize = async () => {
   try {
-    await sequelize.sync({force: true});
+    await sequelize.sync();
     console.log("Database initialized successfully.");
   } catch (error) {
     console.error("Failed to initialize database:", error);

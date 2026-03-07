@@ -4,10 +4,14 @@ import { ProductFilters, ProductDTO } from '../dto/products';
 
 export class ProductService {
   static async getProducts(filters?: Partial<ProductFilters>, userId?: string) {
+    console.log('Fetching products with filters:', filters, 'for user:', userId);
     const where: any = {
       quantity_available: { [Op.gt]: 0 },
-      user_id: { [Op.ne]: userId },
     };
+
+    if (userId) {
+      where.user_id = { [Op.ne]: userId };
+    }
 
     if (filters?.name) {
       where.name = { [Op.iLike]: `%${filters.name}%` };
