@@ -7,11 +7,11 @@ import {
   updateProduct,
   deleteProduct,
 } from "../controllers/products";
-import { requireAuth } from "../middleware/auth";
+import { requireAuth, optionalAuth } from "../middleware/auth";
 
 const router = Router();
 
-router.get("/", getProducts);
+router.get("/", optionalAuth, getProducts);
 router.get("/user/:userId", getUserProducts);
 router.get("/:id", getProductById);
 
