@@ -622,7 +622,6 @@ const seed = async () => {
     ]);
     console.log(`Created 4 deliveries`);
 
-    // orders[0] is COMPLETED — buyer: users[1], seller: users[3]
     await UserRating.bulkCreate([
       {
         reviewee_id: users[3].id,
