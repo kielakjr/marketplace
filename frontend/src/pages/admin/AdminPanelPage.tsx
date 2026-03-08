@@ -1,6 +1,4 @@
 import { Link } from 'react-router';
-import { useProducts } from '@/hooks/useProducts';
-import { useCategories } from '@/hooks/useCategories';
 import { useUsers } from '@/hooks/useUsers';
 import { useAdminOrders } from '@/hooks/useOrders';
 import { useAdminStats } from '@/hooks/useAdmin';
