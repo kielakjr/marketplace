@@ -6,6 +6,7 @@ import {
   updateUser,
   deleteUser,
   toggleUserRole,
+  updateUserStatus
 } from "../controllers/users";
 import { requireAuth, requireAdmin } from "../middleware/auth";
 
@@ -18,5 +19,6 @@ router.post("/", requireAuth, requireAdmin, createUser);
 router.put("/:id", requireAuth, updateUser);
 router.delete("/:id", requireAuth, requireAdmin, deleteUser);
 router.post("/:id/toggle-role", requireAuth, requireAdmin, toggleUserRole);
+router.patch("/:id/status", requireAuth, requireAdmin, updateUserStatus);
 
 export default router;
