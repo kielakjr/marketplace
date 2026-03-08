@@ -1,13 +1,14 @@
-export interface User {
-  id: string;
-  username: string;
-  email: string;
-  role: 'USER' | 'ADMIN';
-  avg_rating: number | null;
-  ratings_count: number;
-  createdAt: string;
-  updatedAt: string;
-}
+  export interface User {
+    id: string;
+    username: string;
+    email: string;
+    role: 'USER' | 'ADMIN';
+    status: 'ACTIVE' | 'BANNED' | 'DEACTIVATED';
+    avg_rating: number | null;
+    ratings_count: number;
+    createdAt: string;
+    updatedAt: string;
+  }
 
 export interface UsersData {
   data: User[];

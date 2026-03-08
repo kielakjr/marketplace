@@ -19,4 +19,7 @@ export const productsApi = {
 
   delete: (id: string) =>
     api.delete(`/products/${id}`).then((res) => res.data),
+
+  adminGetAll: (filters?: ProductFilters) =>
+    api.get<ProductsData>('/products/admin/all', { params: filters }).then((res) => res.data),
 };

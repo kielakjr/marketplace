@@ -35,4 +35,7 @@ export const usersApi = {
 
   toggleRole: (id: string) =>
     api.post(`/users/${id}/toggle-role`).then((res) => res.data),
+
+  updateStatus: (id: string, status: 'ACTIVE' | 'BANNED' | 'DEACTIVATED') =>
+    api.patch<User>(`/users/${id}/status`, { status }).then((res) => res.data),
 };
