@@ -1,5 +1,5 @@
 import type { User } from '@/types/user';
-import { useUserToggleRole, useUserDelete } from '@/hooks/useUsers';
+import { useUserToggleRole, useUserDelete, useUserUpdateStatus } from '@/hooks/useUsers';
 import Avatar from '@/components/ui/Avatar';
 import { Link } from 'react-router';
 
@@ -11,6 +11,7 @@ interface Props {
 export default function UserCard({ user, onEdit }: Props) {
   const toggleRoleMutation = useUserToggleRole(user.id);
   const deleteMutation = useUserDelete(user.id);
+  const statusMutation = useUserUpdateStatus(user.id);
   const isAdmin = user.role === 'ADMIN';
 
   const createdAt = new Date(user.createdAt).toLocaleDateString('pl-PL', {
@@ -36,6 +37,15 @@ export default function UserCard({ user, onEdit }: Props) {
             : 'bg-cream-100 text-brand-700 ring-brand-200'
         }`}>
           {user.role}
+        </span>
+        <span className={`ml-2 shrink-0 rounded-full px-3 py-1 text-xs font-semibold ring-1 ${
+          user.status === 'ACTIVE'
+            ? 'bg-green-50 text-green-700 ring-green-200'
+            : user.status === 'BANNED'
+            ? 'bg-red-50 text-red-700 ring-red-200'
+            : 'bg-gray-50 text-gray-700 ring-gray-200'
+          }`}>
+          {user.status}
         </span>
       </div>
 
@@ -72,6 +82,18 @@ export default function UserCard({ user, onEdit }: Props) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
           </svg>
           Rola
+        </button>
+        <button
+            onClick={() =>
+              statusMutation.mutate(user.status === 'BANNED' ? 'ACTIVE' : 'BANNED')
+            }
+            className={`flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-medium transition ${
+              user.status === 'BANNED'
+                ? 'border-green-200 bg-green-50 text-green-600 hover:bg-green-100'
+                : 'border-orange-200 bg-orange-50 text-orange-600 hover:bg-orange-100'
+            }`}
+        >
+            {user.status === 'BANNED' ? 'Odbanuj' : 'Banuj'}
         </button>
         <button
           onClick={() => deleteMutation.mutate()}
