@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect, use } from 'react';
 import { useUserProducts, useDeleteProduct } from '@/hooks/useProducts';
 import { useAppSelector } from '@/store/hooks';
 import { formatPrice } from '@/utils/formatPrice';
@@ -27,6 +27,10 @@ const MyProductsPage = () => {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [stockFilter, setStockFilter] = useState<'all' | 'in' | 'out'>('all');
+
+  useEffect(() => {
+    setPage(1);
+  }, [query, stockFilter]);
 
   const filteredProducts = useMemo(() => {
     if (!myProducts) return [];
