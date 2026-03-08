@@ -12,16 +12,11 @@ import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 
 const AdminPanelPage = () => {
-  const { data: productsData, isLoading: productsLoading } = useProducts();
-  const { data: categories, isLoading: categoriesLoading } = useCategories();
   const { data: usersData, isLoading: usersLoading } = useUsers({ page: 1, limit: 4, sortBy: 'createdAt', sortOrder: 'desc' });
   const { data: orders, isLoading: ordersLoading, error } = useAdminOrders();
   const { data: stats, isLoading: statsLoading } = useAdminStats();
-  const usersCount = usersData?.pagination.total ?? 0;
 
-  const isLoading = productsLoading || categoriesLoading || usersLoading || ordersLoading;
-
-  const products = productsData?.data || [];
+  const isLoading = usersLoading || ordersLoading;
 
   const latestUsers = usersData?.data ?? [];
   const latestOrders = orders?.slice(0, 4) ?? [];
