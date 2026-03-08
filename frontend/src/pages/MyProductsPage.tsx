@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, use } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useUserProducts, useDeleteProduct } from '@/hooks/useProducts';
 import { useAppSelector } from '@/store/hooks';
 import { formatPrice } from '@/utils/formatPrice';
