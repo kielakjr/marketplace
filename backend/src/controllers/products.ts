@@ -162,6 +162,14 @@ export async function createProduct(req: Request<{}, {}, ProductCreationAttribut
 
 export async function updateProduct(req: Request<{ id: string }, {}, ProductUpdateAttributes>, res: Response) {
   try {
+    const existing = await ProductService.getProductById(req.params.id);
+    if (!existing) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    if (req.user?.role !== 'ADMIN' && existing.user_id !== req.user?.userId) {
+      return res.status(403).json({ error: 'You can only edit your own products' });
+    }
+
     const product = await ProductService.updateProduct(req.params.id, req.body);
     res.json(product);
   } catch (error: unknown) {
@@ -174,6 +182,13 @@ export async function updateProduct(req: Request<{ id: string }, {}, ProductUpda
 
 export async function deleteProduct(req: Request<{ id: string }>, res: Response) {
   try {
+    const existing = await ProductService.getProductById(req.params.id);
+    if (!existing) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    if (req.user?.role !== 'ADMIN' && existing.user_id !== req.user?.userId) {
+      return res.status(403).json({ error: 'You can only delete your own products' });
+    }
     await ProductService.deleteProduct(req.params.id);
     res.status(204).send();
   } catch (error: unknown) {

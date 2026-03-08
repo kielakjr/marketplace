@@ -81,6 +81,16 @@ export async function createUser(req: Request<{}, {}, UserCreationAttributes>, r
 
 export async function updateUser(req: Request<{ id: string }, {}, UserUpdateAttributes>, res: Response) {
   try {
+    
+    if (req.user?.role !== 'ADMIN' && req.user?.userId !== req.params.id) {
+      return res.status(403).json({ error: 'You can only update your own account' });
+    }
+
+    if (req.user?.role !== 'ADMIN') {
+      delete (req.body as any).role;
+      delete (req.body as any).status;
+    }
+
     const user = await UserService.updateUser(req.params.id, req.body);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
