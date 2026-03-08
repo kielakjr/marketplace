@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { verifyToken, JwtPayload } from "../utils/jwt";
 import { env } from "../config/env";
+import { User } from "../models";
 
 declare global {
   namespace Express {
@@ -10,7 +11,7 @@ declare global {
   }
 }
 
-export function requireAuth(req: Request, res: Response, next: NextFunction): void {
+export async function requireAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const token = req.cookies[env.COOKIE_NAME];
 
@@ -20,6 +21,13 @@ export function requireAuth(req: Request, res: Response, next: NextFunction): vo
     }
 
     const payload = verifyToken(token);
+
+    const user = await User.findByPk(payload.userId, { attributes: ['status'] });
+    if (!user || user.status !== 'ACTIVE') {
+      res.status(403).json({ error: "Account is suspended or deactivated" });
+      return;
+    }
+    
     req.user = payload;
     next();
   } catch (error) {

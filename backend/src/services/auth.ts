@@ -57,6 +57,14 @@ export class AuthService {
       throw new Error("Invalid email or password");
     }
 
+    if (user.status === 'BANNED') {
+      throw new Error('Your account has been banned.');
+    }
+    
+    if (user.status === 'DEACTIVATED') {
+      throw new Error('Your account has been deactivated.');
+    }
+
     const token = generateToken({ userId: user.id, role: user.role });
 
     return {
