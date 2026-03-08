@@ -17,6 +17,8 @@ export interface UserUpdateAttributes {
   username?: string;
   email?: string;
   password?: string;
+  role?: 'USER' | 'ADMIN';
+  status?: 'ACTIVE' | 'BANNED' | 'DEACTIVATED';
 }
 
 export interface UserFilters {

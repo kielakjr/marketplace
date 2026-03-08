@@ -1,8 +1,7 @@
 import { Link } from 'react-router';
-import { useProducts } from '@/hooks/useProducts';
-import { useCategories } from '@/hooks/useCategories';
 import { useUsers } from '@/hooks/useUsers';
 import { useAdminOrders } from '@/hooks/useOrders';
+import { useAdminStats } from '@/hooks/useAdmin';
 import { formatPrice } from '@/utils/formatPrice';
 import { orderStatusLabels, orderStatusVariant } from '@/utils/orderStatus';
 import Card from '@/components/ui/Card';
@@ -11,15 +10,11 @@ import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 
 const AdminPanelPage = () => {
-  const { data: productsData, isLoading: productsLoading } = useProducts();
-  const { data: categories, isLoading: categoriesLoading } = useCategories();
   const { data: usersData, isLoading: usersLoading } = useUsers({ page: 1, limit: 4, sortBy: 'createdAt', sortOrder: 'desc' });
   const { data: orders, isLoading: ordersLoading, error } = useAdminOrders();
-  const usersCount = usersData?.pagination.total ?? 0;
+  const { data: stats, isLoading: statsLoading } = useAdminStats();
 
-  const isLoading = productsLoading || categoriesLoading || usersLoading || ordersLoading;
-
-  const products = productsData?.data || [];
+  const isLoading = usersLoading || ordersLoading;
 
   const latestUsers = usersData?.data ?? [];
   const latestOrders = orders?.slice(0, 4) ?? [];
@@ -35,25 +30,31 @@ const AdminPanelPage = () => {
         <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <Card className="flex flex-col gap-2">
             <p className="text-xs uppercase tracking-wide text-brand-500">Produkty</p>
-            {isLoading ? <Spinner size="sm" /> : <p className="text-2xl font-bold text-brand-800">{products?.length ?? 0}</p>}
-            <p className="text-xs text-gray-500">Aktywne oferty</p>
+            {statsLoading ? <Spinner size="sm" /> : <p className="text-2xl font-bold text-brand-800">{stats?.totalProducts ?? 0}</p>}
+            <p className="text-xs text-gray-500">Łącznie w systemie</p>
           </Card>
           <Card className="flex flex-col gap-2">
             <p className="text-xs uppercase tracking-wide text-brand-500">Kategorie</p>
-            {isLoading ? <Spinner size="sm" /> : <p className="text-2xl font-bold text-brand-800">{categories?.length ?? 0}</p>}
+            {statsLoading ? <Spinner size="sm" /> : <p className="text-2xl font-bold text-brand-800">{stats?.totalCategories ?? 0}</p>}
             <p className="text-xs text-gray-500">Zdefiniowane sekcje</p>
           </Card>
           <Card className="flex flex-col gap-2">
             <p className="text-xs uppercase tracking-wide text-brand-500">Użytkownicy</p>
-            {isLoading ? <Spinner size="sm" /> : <p className="text-2xl font-bold text-brand-800">{usersCount}</p>}
+            {statsLoading ? <Spinner size="sm" /> : <p className="text-2xl font-bold text-brand-800">{stats?.totalUsers ?? 0}</p>}
             <p className="text-xs text-gray-500">Zarejestrowane konta</p>
           </Card>
           <Card className="flex flex-col gap-2">
             <p className="text-xs uppercase tracking-wide text-brand-500">Zamówienia</p>
-            {isLoading ? <Spinner size="sm" /> : <p className="text-2xl font-bold text-brand-800">{orders?.length ?? 0}</p>}
+            {statsLoading ? <Spinner size="sm" /> : <p className="text-2xl font-bold text-brand-800">{stats?.totalOrders ?? 0}</p>}
             <p className="text-xs text-gray-500">Łącznie w systemie</p>
           </Card>
         </div>
+
+        {stats && stats.totalBanned > 0 && (
+          <div className="mt-3 rounded-xl border border-orange-200 bg-orange-50 px-4 py-2 text-sm text-orange-700">
+            Zbanowanych kont: <strong>{stats.totalBanned}</strong>
+          </div>
+        )}
       </div>
 
       {error && (

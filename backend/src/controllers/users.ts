@@ -81,6 +81,16 @@ export async function createUser(req: Request<{}, {}, UserCreationAttributes>, r
 
 export async function updateUser(req: Request<{ id: string }, {}, UserUpdateAttributes>, res: Response) {
   try {
+
+    if (req.user?.role !== 'ADMIN' && req.user?.userId !== req.params.id) {
+      return res.status(403).json({ error: 'You can only update your own account' });
+    }
+
+    if (req.user?.role !== 'ADMIN') {
+      delete (req.body as any).role;
+      delete (req.body as any).status;
+    }
+
     const user = await UserService.updateUser(req.params.id, req.body);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
@@ -118,5 +128,22 @@ export async function toggleUserRole(req: Request<{ id: string }>, res: Response
       return res.status(404).json({ error: error.message });
     }
     res.status(500).json({ error: "Failed to toggle user role" });
+  }
+}
+
+export async function updateUserStatus(req: Request<{ id: string }, {}, { status: string }>, res: Response) {
+  try {
+    const { status } = req.body;
+    const VALID_STATUSES = ['ACTIVE', 'BANNED', 'DEACTIVATED'] as const;
+    if (!VALID_STATUSES.includes(status as any)) {
+      return res.status(400).json({ error: `Status must be one of: ${VALID_STATUSES.join(', ')}` });
+    }
+    const user = await UserService.updateStatus(req.params.id, status as 'ACTIVE' | 'BANNED' | 'DEACTIVATED');
+    res.json(user);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return res.status(400).json({ error: error.message });
+    }
+    res.status(500).json({ error: 'Failed to update user status' });
   }
 }

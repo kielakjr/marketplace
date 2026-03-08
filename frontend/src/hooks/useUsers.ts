@@ -74,3 +74,15 @@ export function useUserCreate() {
     },
   });
 }
+
+  export function useUserUpdateStatus(id: string) {
+    const queryClient = useQueryClient();
+    return useMutation({
+      mutationFn: (status: 'ACTIVE' | 'BANNED' | 'DEACTIVATED') =>
+        usersApi.updateStatus(id, status),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: userKeys.detail(id) });
+        queryClient.invalidateQueries({ queryKey: userKeys.all });
+      },
+    });
+  }

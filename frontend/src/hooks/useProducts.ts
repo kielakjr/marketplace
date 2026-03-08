@@ -25,6 +25,13 @@ export function useUserProducts(userId: string, filters?: ProductFilters) {
   });
 }
 
+export function useAdminProducts(filters?: ProductFilters) {
+    return useQuery({
+      queryKey: ['admin-products', filters],
+      queryFn: () => productsApi.adminGetAll(filters),
+    });
+  }
+
 export function useProduct(id: string) {
   return useQuery({
     queryKey: productKeys.detail(id),

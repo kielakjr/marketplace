@@ -148,6 +148,45 @@ export async function getUserProducts(req: Request<{userId: string}, {}, {}, Pro
   }
 }
 
+export async function adminGetProducts(req: Request<{}, {}, {}, ProductFilters>, res: Response) {
+  try {
+    const filters: ProductFilters = {};
+    if (req.query.name) filters.name = req.query.name as string;
+    if (req.query.categoryId) {
+      const categoryId = parseInt(req.query.categoryId as unknown as string);
+      if (isNaN(categoryId)) return res.status(400).json({ error: 'Invalid categoryId' });
+      filters.categoryId = categoryId;
+    }
+    if (req.query.limit) {
+      const limit = parseInt(req.query.limit as unknown as string);
+      if (isNaN(limit) || limit < 1) return res.status(400).json({ error: 'Invalid limit' });
+      filters.limit = limit;
+    }
+    if (req.query.page) {
+      const page = parseInt(req.query.page as unknown as string);
+      if (isNaN(page) || page < 1) return res.status(400).json({ error: 'Invalid page' });
+      filters.page = page;
+    }
+    if (req.query.sortBy) {
+      if (!VALID_SORT_BY.includes(req.query.sortBy as any)) {
+        return res.status(400).json({ error: `sortBy must be one of: ${VALID_SORT_BY.join(', ')}` });
+      }
+      filters.sortBy = req.query.sortBy as 'price' | 'createdAt';
+    }
+    if (req.query.sortOrder) {
+      if (!VALID_SORT_ORDER.includes(req.query.sortOrder as any)) {
+        return res.status(400).json({ error: `sortOrder must be one of: asc, desc` });
+      }
+      filters.sortOrder = req.query.sortOrder as 'asc' | 'desc';
+    }
+
+    const products = await ProductService.getAllProductsAdmin(filters);
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch products' });
+  }
+}
+
 export async function createProduct(req: Request<{}, {}, ProductCreationAttributes>, res: Response) {
   try {
     const product = await ProductService.createProduct(req.body);
@@ -162,6 +201,14 @@ export async function createProduct(req: Request<{}, {}, ProductCreationAttribut
 
 export async function updateProduct(req: Request<{ id: string }, {}, ProductUpdateAttributes>, res: Response) {
   try {
+    const existing = await ProductService.getProductById(req.params.id);
+    if (!existing) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    if (req.user?.role !== 'ADMIN' && existing.user_id !== req.user?.userId) {
+      return res.status(403).json({ error: 'You can only edit your own products' });
+    }
+
     const product = await ProductService.updateProduct(req.params.id, req.body);
     res.json(product);
   } catch (error: unknown) {
@@ -174,6 +221,13 @@ export async function updateProduct(req: Request<{ id: string }, {}, ProductUpda
 
 export async function deleteProduct(req: Request<{ id: string }>, res: Response) {
   try {
+    const existing = await ProductService.getProductById(req.params.id);
+    if (!existing) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    if (req.user?.role !== 'ADMIN' && existing.user_id !== req.user?.userId) {
+      return res.status(403).json({ error: 'You can only delete your own products' });
+    }
     await ProductService.deleteProduct(req.params.id);
     res.status(204).send();
   } catch (error: unknown) {

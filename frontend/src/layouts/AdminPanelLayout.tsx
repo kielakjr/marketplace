@@ -4,6 +4,7 @@ import Button from '@/components/ui/Button';
 
 const navItems = [
   { to: '/admin', label: 'Przegląd', end: true },
+  { to: '/admin/products', label: 'Produkty' },
   { to: '/admin/categories', label: 'Kategorie' },
   { to: '/admin/users', label: 'Użytkownicy' },
   { to: '/admin/orders', label: 'Zamówienia' },

@@ -6,11 +6,13 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
+  adminGetProducts,
 } from "../controllers/products";
-import { requireAuth, optionalAuth } from "../middleware/auth";
+import { requireAuth, optionalAuth, requireAdmin } from "../middleware/auth";
 
 const router = Router();
 
+router.get("/admin/all", requireAuth, requireAdmin, adminGetProducts);
 router.get("/", optionalAuth, getProducts);
 router.get("/user/:userId", getUserProducts);
 router.get("/:id", getProductById);

@@ -43,6 +43,13 @@ export class User extends Model {
   role!: 'USER' | 'ADMIN';
 
   @Column({
+    type: DataType.ENUM('ACTIVE', 'BANNED', 'DEACTIVATED'),
+    allowNull: false,
+    defaultValue: 'ACTIVE',
+  })
+  status!: 'ACTIVE' | 'BANNED' | 'DEACTIVATED';
+
+  @Column({
   type: DataType.DECIMAL(3, 2),
   allowNull: true,
   defaultValue: null,

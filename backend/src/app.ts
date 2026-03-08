@@ -14,6 +14,7 @@ import orderRoutes from "./routes/orders";
 import deliveryRoutes from "./routes/deliveries";
 import paymentRoutes from "./routes/payments";
 import userRatingRoutes from "./routes/userRatings";
+import adminRoutes from "./routes/admin";
 
 const app = express();
 
@@ -37,10 +38,11 @@ app.use("/orders", orderRoutes);
 app.use("/deliveries", deliveryRoutes);
 app.use("/payments", paymentRoutes);
 app.use("/ratings", userRatingRoutes);
+app.use("/admin", adminRoutes);
 
 const initialize = async () => {
   try {
-    await sequelize.sync();
+    await sequelize.sync({ alter: true });
     console.log("Database initialized successfully.");
   } catch (error) {
     console.error("Failed to initialize database:", error);

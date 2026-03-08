@@ -81,4 +81,15 @@ export class UserService {
     const newRole = user.role === 'ADMIN' ? 'USER' : 'ADMIN';
     return user.update({ role: newRole });
   }
+
+  static async updateStatus(id: string, status: 'ACTIVE' | 'BANNED' | 'DEACTIVATED') {
+    const user = await User.findByPk(id);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    if (user.role === 'ADMIN' && status !== 'ACTIVE') {
+      throw new Error('Cannot ban or deactivate an admin user');
+    }
+    return user.update({ status });
+  }
 }
