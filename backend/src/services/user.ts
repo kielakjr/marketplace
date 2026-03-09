@@ -25,6 +25,7 @@ export class UserService {
 
   const { rows: users, count: total } = await User.findAndCountAll({
     where,
+    attributes: { exclude: ['password_hash'] },
     order: [[sortBy, sortOrder]],
     limit,
     offset,

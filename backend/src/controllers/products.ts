@@ -1,19 +1,8 @@
 import { ProductService } from '../services/product';
 import { Request, Response } from 'express';
 import { ProductFilters } from '../dto/products';
+import { createProductSchema, updateProductSchema, ProductCreationAttributes, ProductUpdateAttributes } from '../validation/products';
 
-interface ProductCreationAttributes {
-  name: string;
-  description: string;
-  price: number;
-  userId: string;
-}
-
-interface ProductUpdateAttributes {
-  name?: string;
-  description?: string;
-  price?: number;
-}
 
 const VALID_SORT_BY = ['price', 'createdAt'] as const;
 const VALID_SORT_ORDER = ['asc', 'desc'] as const;
@@ -189,7 +178,11 @@ export async function adminGetProducts(req: Request<{}, {}, {}, ProductFilters>,
 
 export async function createProduct(req: Request<{}, {}, ProductCreationAttributes>, res: Response) {
   try {
-    const product = await ProductService.createProduct(req.body);
+    const validated = createProductSchema.parse(req.body);
+    const product = await ProductService.createProduct({
+    ...validated,
+    user_id: req.user!.userId,
+  });
     res.status(201).json(product);
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -201,6 +194,7 @@ export async function createProduct(req: Request<{}, {}, ProductCreationAttribut
 
 export async function updateProduct(req: Request<{ id: string }, {}, ProductUpdateAttributes>, res: Response) {
   try {
+    const validated = updateProductSchema.parse(req.body);
     const existing = await ProductService.getProductById(req.params.id);
     if (!existing) {
       return res.status(404).json({ error: 'Product not found' });
@@ -209,7 +203,7 @@ export async function updateProduct(req: Request<{ id: string }, {}, ProductUpda
       return res.status(403).json({ error: 'You can only edit your own products' });
     }
 
-    const product = await ProductService.updateProduct(req.params.id, req.body);
+    const product = await ProductService.updateProduct(req.params.id, validated);
     res.json(product);
   } catch (error: unknown) {
     if (error instanceof Error) {
