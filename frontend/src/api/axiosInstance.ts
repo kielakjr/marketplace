@@ -2,12 +2,29 @@ import axios from 'axios';
 import { store } from '../store';
 import { logoutThunk } from '../store/slices/authSlice';
 
+const CSRF_COOKIE_NAME = 'marketplace_csrf';
+
+function getCsrfToken(): string | undefined {
+  const match = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith(`${CSRF_COOKIE_NAME}=`));
+  return match?.split('=')[1];
+}
+
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}` : '/api',
   headers: {
     'Content-Type': 'application/json',
   },
   withCredentials: true,
+});
+
+api.interceptors.request.use((config) => {
+  const csrfToken = getCsrfToken();
+  if (csrfToken) {
+    config.headers['X-CSRF-Token'] = csrfToken;
+  }
+  return config;
 });
 
 api.interceptors.response.use(

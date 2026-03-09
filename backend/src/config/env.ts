@@ -9,6 +9,7 @@ export const env = {
   JWT_EXPIRES_IN: (process.env.JWT_EXPIRES_IN || "7d") as `${number}${"s" | "m" | "h" | "d"}`,
 
   COOKIE_NAME: "marketplace_token",
+  CSRF_COOKIE_NAME: "marketplace_csrf",
   COOKIE_MAX_AGE: 7 * 24 * 60 * 60 * 1000,
 
   FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:5173",

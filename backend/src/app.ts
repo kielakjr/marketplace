@@ -7,6 +7,7 @@ import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import { env } from "./config/env";
 
+import { verifyCsrf } from "./middleware/csrf";
 import authRoutes from "./routes/auth";
 import userRoutes from "./routes/users";
 import productRoutes from "./routes/products";
@@ -38,6 +39,8 @@ app.use(rateLimit({
 app.use(cookieParser());
 
 app.use(express.json({ limit: "1mb" }));
+
+app.use(verifyCsrf);
 
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
