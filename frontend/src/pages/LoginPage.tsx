@@ -1,6 +1,5 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useLocation } from 'react-router';
-import { useAppSelector } from '@/store/hooks';
 import { useAuth } from '@/hooks/useAuth';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
@@ -12,7 +11,7 @@ const LoginPage = () => {
 
   const { login } = useAuth();
   const location = useLocation();
-  const { isLoading } = useAppSelector((state) => state.auth);
+  const { isLoading } = useAuth();
 
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname;
 

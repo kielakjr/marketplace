@@ -1,6 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useUserProducts, useDeleteProduct } from '@/hooks/useProducts';
-import { useAppSelector } from '@/store/hooks';
 import { formatPrice } from '@/utils/formatPrice';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
@@ -10,10 +9,11 @@ import Modal from '@/components/ui/Modal';
 import ProductForm from '@/components/ProductForm';
 import type { Product } from '@/types/product';
 import Pagination from '@/components/Pagination';
+import { useAuth } from '@/hooks/useAuth';
 
 const MyProductsPage = () => {
   const [page, setPage] = useState(1);
-  const { user } = useAppSelector((state) => state.auth);
+  const { user } = useAuth();
   const { data: products, isLoading } = useUserProducts(user!.id, {
     limit: 3,
     page

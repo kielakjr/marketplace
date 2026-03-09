@@ -1,13 +1,13 @@
 import { Navigate, Outlet, useLocation } from 'react-router';
-import { useAppSelector } from '@/store/hooks';
 import Spinner from '@/components/ui/Spinner';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ProtectedRouteProps {
   requiredRole?: 'ADMIN' | 'USER';
 }
 
 const ProtectedRoute = ({ requiredRole }: ProtectedRouteProps) => {
-  const { isAuthenticated, isInitialized, isLoading, user } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, isInitialized, isLoading, user } = useAuth();
   const location = useLocation();
 
   if (!isInitialized || isLoading) {

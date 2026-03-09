@@ -2,16 +2,16 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router';
 import { useProduct } from '@/hooks/useProducts';
 import { useAddToCart } from '@/hooks/useCart';
-import { useAppSelector } from '@/store/hooks';
 import { formatPrice } from '@/utils/formatPrice';
 import Spinner from '@/components/ui/Spinner';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
+import { useAuth } from '@/hooks/useAuth';
 
 const ProductDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const { data: product, isLoading, isError } = useProduct(id!);
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const { isAuthenticated } = useAuth();
   const addToCart = useAddToCart();
   const [selectedImage, setSelectedImage] = useState(0);
 

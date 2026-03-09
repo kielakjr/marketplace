@@ -1,8 +1,8 @@
 import { Outlet, Navigate } from 'react-router';
-import { useAppSelector } from '@/store/hooks';
+import { useAuth } from '@/hooks/useAuth';
 
 const AuthLayout = () => {
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const { isAuthenticated } = useAuth();
 
   if (isAuthenticated) {
     return <Navigate to="/" replace />;

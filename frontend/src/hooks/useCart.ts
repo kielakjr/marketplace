@@ -1,14 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { cartApi } from '@/api/cartApi';
 import type { AddToCartPayload, UpdateCartItemPayload } from '@/types/cart';
-import { useAppSelector } from '@/store/hooks';
+import { useAuth } from '@/hooks/useAuth';
 
 export const cartKeys = {
   all: ['carts'] as const,
 };
 
 export function useCarts() {
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const { isAuthenticated } = useAuth();
 
   return useQuery({
     queryKey: cartKeys.all,

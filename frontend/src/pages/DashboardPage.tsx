@@ -1,5 +1,4 @@
 import { Link } from 'react-router';
-import { useAppSelector } from '@/store/hooks';
 import { useUserProducts } from '@/hooks/useProducts';
 import { useOrders } from '@/hooks/useOrders';
 import { formatPrice } from '@/utils/formatPrice';
@@ -8,9 +7,10 @@ import Card from '@/components/ui/Card';
 import Spinner from '@/components/ui/Spinner';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
+import { useAuth } from '@/hooks/useAuth';
 
 const DashboardPage = () => {
-  const { user } = useAppSelector((state) => state.auth);
+  const { user } = useAuth();
   const { data: products, isLoading: productsLoading } = useUserProducts(user!.id);
   const { data: orders, isLoading: ordersLoading } = useOrders();
 

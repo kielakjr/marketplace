@@ -5,11 +5,12 @@ import { toggleMobileMenu } from '@/store/slices/uiSlice';
 import { useCartItemCount } from '@/hooks/useCart';
 import { useQueryClient } from '@tanstack/react-query';
 import { cartKeys } from '@/hooks/useCart';
+import { useAuth } from '@/hooks/useAuth';
 
 const Navbar = () => {
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
-  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, user } = useAuth();
   const cartCount = useCartItemCount();
   const { isMobileMenuOpen } = useAppSelector((state) => state.ui);
 

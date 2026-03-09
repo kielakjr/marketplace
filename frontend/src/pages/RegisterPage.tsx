@@ -1,6 +1,5 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router';
-import { useAppSelector } from '@/store/hooks';
 import { useAuth } from '@/hooks/useAuth';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
@@ -19,7 +18,7 @@ const RegisterPage = () => {
   const [errors, setErrors] = useState<FieldErrors>({});
 
   const { register } = useAuth();
-  const { isLoading } = useAppSelector((state) => state.auth);
+  const { isLoading } = useAuth();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();

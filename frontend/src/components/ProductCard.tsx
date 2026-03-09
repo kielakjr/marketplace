@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 import type { Product } from '@/types/product';
 import { useAddToCart } from '@/hooks/useCart';
-import { useAppSelector } from '@/store/hooks';
+import { useAuth } from '@/hooks/useAuth';
 import { formatPrice } from '@/utils/formatPrice';
 
 interface ProductCardProps {
@@ -9,7 +9,7 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-  const { user, isAuthenticated } = useAppSelector((state) => state.auth);
+  const { user, isAuthenticated } = useAuth();
   const addToCart = useAddToCart();
 
   const handleAddToCart = () => {

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ordersApi } from '@/api/ordersApi';
 import type { CreateOrderPayload } from '@/types/order';
-import { useAppSelector } from '@/store/hooks';
+import { useAuth } from '@/hooks/useAuth';
 
 export const orderKeys = {
   all: ['orders'] as const,
@@ -13,7 +13,7 @@ export const orderKeys = {
 };
 
 export function useOrders() {
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const { isAuthenticated } = useAuth();
   return useQuery({
     queryKey: orderKeys.all,
     queryFn: ordersApi.getAll,
@@ -72,7 +72,7 @@ export function useSentOrder() {
 }
 
 export function useSellerOrders() {
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const { isAuthenticated } = useAuth();
   return useQuery({
     queryKey: orderKeys.seller(),
     queryFn: ordersApi.getSellerOrders,
@@ -89,7 +89,7 @@ export function useSale(id: string) {
 }
 
 export function useAdminOrders() {
-  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
   return useQuery({
     queryKey: orderKeys.admin(),
@@ -99,7 +99,7 @@ export function useAdminOrders() {
 }
 
 export function useAdminOrder(id: string) {
-  const { user } = useAppSelector((state) => state.auth);
+  const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
   return useQuery({
     queryKey: orderKeys.adminDetail(id),

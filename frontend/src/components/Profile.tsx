@@ -14,40 +14,40 @@ const Skeleton = ({ className = '' }: { className?: string }) => (
   <div className={`animate-pulse bg-brand-200/60 rounded-xl ${className}`} />
 )
 
-  const RatingsList = ({ userId }: { userId: string }) => {
-    const { data: ratings, isLoading } = useUserRatings(userId);
+const RatingsList = ({ userId }: { userId: string }) => {
+  const { data: ratings, isLoading } = useUserRatings(userId);
 
-    if (isLoading) return <div className="p-6"><Spinner size="md" /></div>;
+  if (isLoading) return <div className="p-6"><Spinner size="md" /></div>;
 
-    if (!ratings || ratings.length === 0) {
-      return (
-        <div className="p-10 text-center text-brand-400 text-sm">
-          Brak ocen.
-        </div>
-      );
-    }
-
+  if (!ratings || ratings.length === 0) {
     return (
-      <div className="divide-y divide-brand-50">
-        {ratings.map((r) => (
-          <div key={r.id} className="px-6 py-4">
-            <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-brand-800">{r.reviewer.username}</span>
-                <StarRating value={r.rating} size="sm" />
-              </div>
-              <span className="text-xs text-brand-400">
-                {new Date(r.createdAt).toLocaleDateString('pl-PL')}
-              </span>
-            </div>
-            {r.comment && (
-              <p className="text-sm text-brand-600 mt-1">{r.comment}</p>
-            )}
-          </div>
-        ))}
+      <div className="p-10 text-center text-brand-400 text-sm">
+        Brak ocen.
       </div>
     );
-  };
+  }
+
+  return (
+    <div className="divide-y divide-brand-50">
+      {ratings.map((r) => (
+        <div key={r.id} className="px-6 py-4">
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold text-brand-800">{r.reviewer.username}</span>
+              <StarRating value={r.rating} size="sm" />
+            </div>
+            <span className="text-xs text-brand-400">
+              {new Date(r.createdAt).toLocaleDateString('pl-PL')}
+            </span>
+          </div>
+          {r.comment && (
+            <p className="text-sm text-brand-600 mt-1">{r.comment}</p>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const Profile = ({ userId, isMy = false }: { userId: string, isMy?: boolean }) => {
   const [page, setPage] = useState(1);
