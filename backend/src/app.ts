@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import sequelize from "./db";
+import rateLimit from "express-rate-limit";
 import { env } from "./config/env";
 
 import authRoutes from "./routes/auth";
@@ -25,9 +26,15 @@ app.use(
   })
 );
 
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+}));
+
 app.use(cookieParser());
 
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
 
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
