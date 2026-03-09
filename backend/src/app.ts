@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import sequelize from "./db";
 import rateLimit from "express-rate-limit";
+import helmet from "helmet";
 import { env } from "./config/env";
 
 import authRoutes from "./routes/auth";
@@ -25,6 +26,8 @@ app.use(
     credentials: true,
   })
 );
+
+app.use(helmet());
 
 app.use(rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -49,8 +52,13 @@ app.use("/admin", adminRoutes);
 
 const initialize = async () => {
   try {
-    await sequelize.sync({ alter: true });
-    console.log("Database initialized successfully.");
+    if (env.NODE_ENV === "development") {
+      await sequelize.sync({ alter: true });
+      console.log("Database reset and initialized successfully.");
+    } else {
+      await sequelize.sync();
+      console.log("Database initialized successfully.");
+    }
   } catch (error) {
     console.error("Failed to initialize database:", error);
   }
