@@ -207,7 +207,6 @@ export class OrderService {
   }
 
   static async getSellerOrders(sellerId: string) {
-    console.log('Fetching orders for seller:', sellerId);
     return Order.findAll({
       where: { seller_id: sellerId },
       include: [

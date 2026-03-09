@@ -4,7 +4,6 @@ import { ProductFilters, ProductDTO } from '../dto/products';
 
 export class ProductService {
   static async getProducts(filters?: Partial<ProductFilters>, userId?: string) {
-    console.log('Fetching products with filters:', filters, 'for user:', userId);
     const where: any = {
       quantity_available: { [Op.gt]: 0 },
     };

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { AuthService } from "../services/auth";
-import { setTokenCookie, clearTokenCookie } from "../utils/cookie";
+import { setTokenCookie, clearTokenCookie, setCsrfCookie, clearCsrfCookie } from "../utils/cookie";
 import { ZodError } from "zod";
 
 export async function registerUser(req: Request, res: Response) {
@@ -8,6 +8,7 @@ export async function registerUser(req: Request, res: Response) {
     const { token, user } = await AuthService.register(req.body);
 
     setTokenCookie(res, token);
+    setCsrfCookie(res);
 
     res.status(201).json({ user });
   } catch (error: unknown) {
@@ -29,6 +30,7 @@ export async function loginUser(req: Request, res: Response) {
     const { token, user } = await AuthService.login(req.body);
 
     setTokenCookie(res, token);
+    setCsrfCookie(res);
 
     res.json({ user });
   } catch (error: unknown) {
@@ -41,12 +43,14 @@ export async function loginUser(req: Request, res: Response) {
 
 export async function logoutUser(req: Request, res: Response) {
   clearTokenCookie(res);
+  clearCsrfCookie(res);
   res.json({ message: "Logged out successfully" });
 }
 
 export async function getMe(req: Request, res: Response) {
   try {
     const user = await AuthService.getMe(req.user!.userId);
+    setCsrfCookie(res);
     res.json(user);
   } catch (error: unknown) {
     if (error instanceof Error) {

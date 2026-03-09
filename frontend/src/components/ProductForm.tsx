@@ -6,7 +6,6 @@ import Input from '@/components/ui/Input';
 import Textarea from '@/components/ui/Textarea';
 import Select from '@/components/ui/Select';
 import Button from '@/components/ui/Button';
-import { useAppSelector } from '@/store/hooks';
 
 interface ProductFormProps {
   product?: Product | null;
@@ -14,7 +13,6 @@ interface ProductFormProps {
 }
 
 const ProductForm = ({ product, onSuccess }: ProductFormProps) => {
-  const { user } = useAppSelector((state) => state.auth);
   const isEditing = !!product;
 
   const [error, setError] = useState('');
@@ -58,7 +56,6 @@ const ProductForm = ({ product, onSuccess }: ProductFormProps) => {
       price: parseFloat(price),
       quantity_available: parseInt(quantity) || 0,
       category_id: parseInt(categoryId),
-      user_id: user!.id,
     };
 
     startTransition(async () => {
