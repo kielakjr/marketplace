@@ -16,7 +16,7 @@ export function useAuth() {
   const handleLogin = async (credentials: LoginPayload, redirectTo: string = '/') => {
     const result = await dispatch(login(credentials));
     if (login.fulfilled.match(result)) {
-      queryClient.clear();
+      await queryClient.resetQueries();
       navigate(redirectTo, { replace: true });
     }
     return result;
