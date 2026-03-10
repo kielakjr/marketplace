@@ -1,21 +1,16 @@
 import nodemailer from "nodemailer";
+import Transport from "nodemailer-brevo-transport";
 import { env } from "../config/env";
 
-const transporter = nodemailer.createTransport({
-  host: env.SMTP_HOST,
-  port: env.SMTP_PORT,
-  secure: env.SMTP_PORT === 465,
-  auth: {
-    user: env.SMTP_USER,
-    pass: env.SMTP_PASS,
-  },
-});
+const transporter = nodemailer.createTransport(
+  new Transport({ apiKey: env.SMTP_PASS })
+);
 
 export async function sendPasswordResetEmail(to: string, rawToken: string) {
   const resetUrl = `${env.FRONTEND_URL}/reset-password?token=${rawToken}`;
 
   await transporter.sendMail({
-    from: env.SMTP_FROM,
+    from: `"Marketplace" <${env.SMTP_FROM}>`,
     to,
     subject: "Resetowanie hasła",
     html: `
