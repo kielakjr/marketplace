@@ -15,4 +15,10 @@ export const env = {
   FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:5173",
 
   NODE_ENV: process.env.NODE_ENV || "development",
+
+  AWS_S3_BUCKET: process.env.AWS_S3_BUCKET as string,
+  AWS_S3_REGION: process.env.AWS_S3_REGION || "eu-central-1",
+  AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID as string,
+  AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY as string,
+  S3_UPLOAD_MAX_SIZE_MB: parseInt(process.env.S3_UPLOAD_MAX_SIZE_MB || "5"),
 };
