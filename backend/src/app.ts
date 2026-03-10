@@ -18,6 +18,7 @@ import deliveryRoutes from "./routes/deliveries";
 import paymentRoutes from "./routes/payments";
 import userRatingRoutes from "./routes/userRatings";
 import adminRoutes from "./routes/admin";
+import uploadRoutes from "./routes/uploads";
 
 const app = express();
 
@@ -52,6 +53,7 @@ app.use("/deliveries", deliveryRoutes);
 app.use("/payments", paymentRoutes);
 app.use("/ratings", userRatingRoutes);
 app.use("/admin", adminRoutes);
+app.use("/uploads", uploadRoutes);
 
 const initialize = async () => {
   try {
