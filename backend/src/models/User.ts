@@ -50,6 +50,20 @@ export class User extends Model {
   status!: 'ACTIVE' | 'BANNED' | 'DEACTIVATED';
 
   @Column({
+    type: DataType.STRING,
+    allowNull: true,
+    defaultValue: null,
+  })
+  password_reset_token_hash!: string | null;
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+    defaultValue: null,
+  })
+  password_reset_expires!: Date | null;
+
+  @Column({
   type: DataType.DECIMAL(3, 2),
   allowNull: true,
   defaultValue: null,
