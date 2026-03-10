@@ -10,7 +10,7 @@ export function useImageUpload() {
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
-  const uploadImage = useCallback(async (file: File): Promise<string> => {
+  const uploadImage = useCallback(async (file: File, onProgress?: (pct: number) => void): Promise<string> => {
     if (!ALLOWED_TYPES.includes(file.type)) {
       throw new Error(`Niedozwolony typ pliku. Dozwolone: JPEG, PNG, WebP, GIF`);
     }
@@ -32,7 +32,9 @@ export function useImageUpload() {
 
         xhr.upload.onprogress = (e) => {
           if (e.lengthComputable) {
-            setProgress(Math.round((e.loaded / e.total) * 100));
+            const pct = Math.round((e.loaded / e.total) * 100);
+            setProgress(pct);
+            onProgress?.(pct);
           }
         };
 

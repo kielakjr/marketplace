@@ -13,7 +13,6 @@ interface ImageEntry {
   url: string;
   file?: File;
   preview?: string;
-  uploadProgress?: number;
 }
 
 interface ProductFormProps {
@@ -58,7 +57,6 @@ const ProductForm = ({ product, onSuccess }: ProductFormProps) => {
       url: '',
       file,
       preview: URL.createObjectURL(file),
-      uploadProgress: 0,
     }));
 
     setImages((prev) => [...prev, ...newEntries]);
@@ -100,7 +98,6 @@ const ProductForm = ({ product, onSuccess }: ProductFormProps) => {
       try {
         setUploadingImages(true);
 
-        const pendingFiles = images.filter((img) => img.type === 'file' && img.file);
         const uploadedUrls: string[] = [];
 
         for (let i = 0; i < images.length; i++) {
@@ -111,8 +108,8 @@ const ProductForm = ({ product, onSuccess }: ProductFormProps) => {
             const publicUrl = await uploadImage(img.file);
             uploadedUrls.push(publicUrl);
             setImages((prev) =>
-              prev.map((entry, idx) =>
-                idx === i ? { ...entry, type: 'url' as const, url: publicUrl, uploadProgress: 100 } : entry
+              prev.map((entry, j) =>
+                j === i ? { ...entry, type: 'url' as const, url: publicUrl } : entry
               )
             );
           }
@@ -183,11 +180,6 @@ const ProductForm = ({ product, onSuccess }: ProductFormProps) => {
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}
                 />
-                {img.type === 'file' && img.uploadProgress !== undefined && img.uploadProgress < 100 && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                    <span className="text-xs font-medium text-white">{img.uploadProgress}%</span>
-                  </div>
-                )}
                 <button
                   type="button"
                   onClick={() => removeImage(i)}
