@@ -1,7 +1,10 @@
 import bcrypt from "bcrypt";
+import crypto from "crypto";
+import { Op } from "sequelize";
 import { User } from "../models";
 import { generateToken } from "../utils/jwt";
-import { loginSchema, registerSchema } from "../validation/auth";
+import { sendPasswordResetEmail } from "../utils/email";
+import { loginSchema, registerSchema, forgotPasswordSchema, resetPasswordSchema } from "../validation/auth";
 
 export class AuthService {
   static async register(data: { username: string; email: string; password: string }) {
@@ -78,6 +81,55 @@ export class AuthService {
         updatedAt: user.updatedAt,
       },
     };
+  }
+
+  static async forgotPassword(data: { email: string }) {
+    const validated = forgotPasswordSchema.parse(data);
+
+    const user = await User.findOne({ where: { email: validated.email } });
+
+    if (user) {
+      const rawToken = crypto.randomBytes(32).toString("hex");
+      const hash = crypto.createHash("sha256").update(rawToken).digest("hex");
+
+      await user.update({
+        password_reset_token_hash: hash,
+        password_reset_expires: new Date(Date.now() + 30 * 60 * 1000),
+      });
+
+      await sendPasswordResetEmail(user.email, rawToken);
+    }
+
+    return {
+      message: "Jeśli konto z tym adresem email istnieje, link do resetu hasła został wysłany.",
+    };
+  }
+
+  static async resetPassword(data: { token: string; password: string }) {
+    const validated = resetPasswordSchema.parse(data);
+
+    const hash = crypto.createHash("sha256").update(validated.token).digest("hex");
+
+    const user = await User.findOne({
+      where: {
+        password_reset_token_hash: hash,
+        password_reset_expires: { [Op.gt]: new Date() },
+      },
+    });
+
+    if (!user) {
+      throw new Error("Token jest nieprawidłowy lub wygasł.");
+    }
+
+    const password_hash = await bcrypt.hash(validated.password, 10);
+
+    await user.update({
+      password_hash,
+      password_reset_token_hash: null,
+      password_reset_expires: null,
+    });
+
+    return { message: "Hasło zostało zmienione pomyślnie." };
   }
 
   static async getMe(userId: string) {

@@ -21,4 +21,10 @@ export const env = {
   AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID as string,
   AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY as string,
   S3_UPLOAD_MAX_SIZE_MB: parseInt(process.env.S3_UPLOAD_MAX_SIZE_MB || "5"),
+
+  SMTP_HOST: process.env.SMTP_HOST as string,
+  SMTP_PORT: parseInt(process.env.SMTP_PORT || "587"),
+  SMTP_USER: process.env.SMTP_USER as string,
+  SMTP_PASS: process.env.SMTP_PASS as string,
+  SMTP_FROM: process.env.SMTP_FROM || "noreply@marketplace.com",
 };

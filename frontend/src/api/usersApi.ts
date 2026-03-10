@@ -18,6 +18,12 @@ export const usersApi = {
   logout: () =>
     api.post('/auth/logout').then((res) => res.data),
 
+  forgotPassword: (data: { email: string }) =>
+    api.post<{ message: string }>('/auth/forgot-password', data).then((res) => res.data),
+
+  resetPassword: (data: { token: string; password: string }) =>
+    api.post<{ message: string }>('/auth/reset-password', data).then((res) => res.data),
+
   getAll: (filters?: UsersFilters) =>
     api.get<UsersData>('/users', { params: filters }).then((res) => res.data),
 

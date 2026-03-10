@@ -47,6 +47,36 @@ export async function logoutUser(req: Request, res: Response) {
   res.json({ message: "Logged out successfully" });
 }
 
+export async function forgotPassword(req: Request, res: Response) {
+  try {
+    const result = await AuthService.forgotPassword(req.body);
+    res.json(result);
+  } catch (error: unknown) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({ error: error.issues });
+    }
+    if (error instanceof Error) {
+      return res.status(400).json({ error: error.message });
+    }
+    res.status(500).json({ error: "Password reset request failed" });
+  }
+}
+
+export async function resetPassword(req: Request, res: Response) {
+  try {
+    const result = await AuthService.resetPassword(req.body);
+    res.json(result);
+  } catch (error: unknown) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({ error: error.issues });
+    }
+    if (error instanceof Error) {
+      return res.status(400).json({ error: error.message });
+    }
+    res.status(500).json({ error: "Password reset failed" });
+  }
+}
+
 export async function getMe(req: Request, res: Response) {
   try {
     const user = await AuthService.getMe(req.user!.userId);
