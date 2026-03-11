@@ -108,6 +108,12 @@ export function useAdminOrder(id: string) {
   });
 }
 
+export function useCreatePaymentIntent() {
+  return useMutation({
+    mutationFn: (orderId: string) => ordersApi.createPaymentIntent(orderId),
+  });
+}
+
 export function useAdminUpdateOrderStatus() {
   const queryClient = useQueryClient();
   return useMutation({
