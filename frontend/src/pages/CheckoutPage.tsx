@@ -1,14 +1,17 @@
-import { useActionState, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
+import { Elements } from '@stripe/react-stripe-js';
 
 import { useCarts, useCartTotal, cartKeys } from '@/hooks/useCart';
-import { useCreateOrder } from '@/hooks/useOrders';
+import { useCreateOrder, useCreatePaymentIntent } from '@/hooks/useOrders';
 import { formatPrice } from '@/utils/formatPrice';
+import { stripePromise } from '@/utils/stripe';
 
 import Spinner from '@/components/ui/Spinner';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
+import PaymentForm from '@/components/PaymentForm';
 
 const SELLER_COLORS = [
   { bg: 'bg-brand-800', light: 'bg-brand-50', border: 'border-brand-200', dot: 'bg-brand-500' },
@@ -21,43 +24,71 @@ const CheckoutPage = () => {
   const { data: carts, isLoading } = useCarts();
   const cartTotal = useCartTotal();
   const createOrder = useCreateOrder();
+  const createPaymentIntent = useCreatePaymentIntent();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const formRef = useRef<HTMLFormElement>(null);
   const [activeCart, setActiveCart] = useState<number>(0);
 
+  const [step, setStep] = useState<'form' | 'payment'>('form');
+  const [paymentIntents, setPaymentIntents] = useState<Array<{ orderId: string; clientSecret: string }>>([]);
+  const [error, setError] = useState('');
+  const [isPending, setIsPending] = useState(false);
+
   const allItems = carts?.flatMap((c) => c.items) ?? [];
 
-  const checkoutAction = async (_prev: string, formData: FormData) => {
-    const street = (formData.get('street') as string).trim();
-    const streetNumber = (formData.get('streetNumber') as string).trim();
-    const city = (formData.get('city') as string).trim();
-    const postalCode = (formData.get('postalCode') as string).trim();
+  const handleProceedToPayment = async () => {
+    if (!formRef.current) return;
+
+    const formData = new FormData(formRef.current);
+    const street = (formData.get('street') as string)?.trim();
+    const streetNumber = (formData.get('streetNumber') as string)?.trim();
+    const city = (formData.get('city') as string)?.trim();
+    const postalCode = (formData.get('postalCode') as string)?.trim();
 
     if (!street || !streetNumber || !city || !postalCode) {
-      return 'Wszystkie pola adresu są wymagane.';
+      setError('Wszystkie pola adresu są wymagane.');
+      return;
     }
 
     if (allItems.length === 0) {
-      return 'Twój koszyk jest pusty.';
+      setError('Twój koszyk jest pusty.');
+      return;
     }
 
+    setError('');
+    setIsPending(true);
+
     try {
+      const intents: Array<{ orderId: string; clientSecret: string }> = [];
+
       for (const cart of carts ?? []) {
-        await createOrder.mutateAsync({
+        const order = await createOrder.mutateAsync({
           items: cart.items.map((item) => ({ product_id: item.product_id, quantity: item.quantity })),
           address: { street, street_number: streetNumber, city, postal_code: postalCode },
         });
+
+        const { clientSecret } = await createPaymentIntent.mutateAsync(order.id);
+        intents.push({ orderId: order.id, clientSecret });
       }
-      await queryClient.invalidateQueries({ queryKey: cartKeys.all });
-      navigate('/dashboard/orders', { replace: true });
-      return '';
+
+      setPaymentIntents(intents);
+      setStep('payment');
     } catch {
-      return 'Nie udało się złożyć zamówienia. Spróbuj ponownie.';
+      setError('Nie udało się przygotować płatności. Spróbuj ponownie.');
+    } finally {
+      setIsPending(false);
     }
   };
 
-  const [error, formAction, isPending] = useActionState(checkoutAction, '');
+  const handlePaymentSuccess = async () => {
+    await queryClient.invalidateQueries({ queryKey: cartKeys.all });
+    navigate('/dashboard/orders', { replace: true });
+  };
+
+  const handlePaymentError = (message: string) => {
+    setError(message);
+  };
 
   if (isLoading)
     return (
@@ -120,8 +151,8 @@ const CheckoutPage = () => {
               )}
             </div>
 
-            <form ref={formRef} action={formAction} className="p-6">
-              {error && (
+            <form ref={formRef} className="p-6" onSubmit={(e) => e.preventDefault()}>
+              {error && step === 'form' && (
                 <div className="mb-5 flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
                   <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
@@ -131,12 +162,12 @@ const CheckoutPage = () => {
               )}
               <div className="space-y-4">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                  <Input name="street" type="text" placeholder="Ulica" required className="sm:col-span-2" />
-                  <Input name="streetNumber" type="text" placeholder="Nr budynku / lok." required />
+                  <Input name="street" type="text" placeholder="Ulica" required className="sm:col-span-2" disabled={step === 'payment'} />
+                  <Input name="streetNumber" type="text" placeholder="Nr budynku / lok." required disabled={step === 'payment'} />
                 </div>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                  <Input name="postalCode" type="text" placeholder="Kod pocztowy" required />
-                  <Input name="city" type="text" placeholder="Miasto" required className="sm:col-span-2" />
+                  <Input name="postalCode" type="text" placeholder="Kod pocztowy" required disabled={step === 'payment'} />
+                  <Input name="city" type="text" placeholder="Miasto" required className="sm:col-span-2" disabled={step === 'payment'} />
                 </div>
               </div>
 
@@ -152,8 +183,6 @@ const CheckoutPage = () => {
                   </div>
                 ))}
               </dl>
-
-              <input type="submit" className="hidden" id="checkout-submit" />
             </form>
           </div>
 
@@ -224,6 +253,34 @@ const CheckoutPage = () => {
             </div>
           </div>
 
+          {step === 'payment' && (
+            <div className="overflow-hidden rounded-3xl border border-brand-200 bg-white shadow-md">
+              <div className="bg-brand-800 px-6 py-4">
+                <p className="text-xs font-semibold uppercase tracking-widest text-brand-300">Krok 3</p>
+                <h2 className="mt-1 text-2xl font-bold text-white">Płatność</h2>
+              </div>
+
+              <div className="p-6">
+                {error && (
+                  <div className="mb-5 flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                    <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                    </svg>
+                    {error}
+                  </div>
+                )}
+
+                <Elements stripe={stripePromise}>
+                  <PaymentForm
+                    paymentIntents={paymentIntents}
+                    onSuccess={handlePaymentSuccess}
+                    onError={handlePaymentError}
+                  />
+                </Elements>
+              </div>
+            </div>
+          )}
+
           <div className="grid gap-4 sm:grid-cols-3">
             {[
               { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', title: 'Bezpieczna płatność', desc: 'Szyfrowane połączenie SSL.' },
@@ -248,7 +305,9 @@ const CheckoutPage = () => {
         <aside className="space-y-5 lg:sticky lg:top-8 lg:self-start">
           <div className="overflow-hidden rounded-3xl border border-brand-200 bg-white shadow-md">
             <div className="bg-brand-800 px-6 py-4">
-              <p className="text-xs font-semibold uppercase tracking-widest text-brand-300">Krok 3</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-brand-300">
+                Krok {step === 'payment' ? '4' : '3'}
+              </p>
               <h2 className="mt-1 text-2xl font-bold text-white">Podsumowanie</h2>
             </div>
 
@@ -301,27 +360,29 @@ const CheckoutPage = () => {
                 </span>
               </div>
 
-              <label className="mt-5 block">
-                <Button
-                  type="button"
-                  className="w-full"
-                  size="lg"
-                  isLoading={isPending}
-                  disabled={allItems.length === 0 || isPending}
-                  onClick={() => formRef.current?.requestSubmit()}
-                >
-                  {isPending ? (
-                    'Składanie zamówienia...'
-                  ) : (
-                    <span className="flex items-center gap-2">
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      Zapłać i zamów — {formatPrice(cartTotal)}
-                    </span>
-                  )}
-                </Button>
-              </label>
+              {step === 'form' && (
+                <label className="mt-5 block">
+                  <Button
+                    type="button"
+                    className="w-full"
+                    size="lg"
+                    isLoading={isPending}
+                    disabled={allItems.length === 0 || isPending}
+                    onClick={handleProceedToPayment}
+                  >
+                    {isPending ? (
+                      'Przygotowywanie płatności...'
+                    ) : (
+                      <span className="flex items-center gap-2">
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Przejdź do płatności — {formatPrice(cartTotal)}
+                      </span>
+                    )}
+                  </Button>
+                </label>
+              )}
 
               {carts.length > 1 && (
                 <p className="mt-2 text-center text-xs text-amber-600">
