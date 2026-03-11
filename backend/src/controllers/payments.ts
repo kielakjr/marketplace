@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { PaymentService } from "../services/payment";
 import { updatePaymentSchema } from "../validation/payment";
+import { stripe } from "../utils/stripe";
+import { env } from "../config/env";
 
 export async function processPayment(req: Request<{ orderId: string }>, res: Response) {
   try {
@@ -31,5 +33,37 @@ export async function updatePaymentStatus(req: Request<{ id: string }>, res: Res
       return res.status(400).json({ error: error.message });
     }
     res.status(500).json({ error: "Failed to update payment" });
+  }
+}
+
+export async function createPaymentIntent(req: Request<{ orderId: string }>, res: Response) {
+  try {
+    const result = await PaymentService.createPaymentIntent(
+      req.params.orderId,
+      req.user!.userId
+    );
+    res.json(result);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.message.includes("not found")) return res.status(404).json({ error: error.message });
+      if (error.message.includes("already")) return res.status(400).json({ error: error.message });
+      return res.status(400).json({ error: error.message });
+    }
+    res.status(500).json({ error: "Failed to create payment intent" });
+  }
+}
+
+export async function stripeWebhook(req: Request, res: Response) {
+  const sig = req.headers["stripe-signature"] as string;
+
+  try {
+    const event = stripe.webhooks.constructEvent(req.body, sig, env.STRIPE_WEBHOOK_SECRET);
+    await PaymentService.handleWebhookEvent(event);
+    res.json({ received: true });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return res.status(400).json({ error: `Webhook error: ${error.message}` });
+    }
+    res.status(400).json({ error: "Webhook error" });
   }
 }

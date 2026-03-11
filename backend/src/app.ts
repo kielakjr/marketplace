@@ -19,6 +19,7 @@ import paymentRoutes from "./routes/payments";
 import userRatingRoutes from "./routes/userRatings";
 import adminRoutes from "./routes/admin";
 import uploadRoutes from "./routes/uploads";
+import { stripeWebhook } from "./controllers/payments";
 
 const app = express();
 
@@ -30,6 +31,8 @@ app.use(
 );
 
 app.use(helmet());
+
+app.post("/payments/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 
 app.use(rateLimit({
   windowMs: 15 * 60 * 1000,

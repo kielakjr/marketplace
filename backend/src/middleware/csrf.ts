@@ -4,7 +4,7 @@ import { env } from "../config/env";
 const CSRF_HEADER = "x-csrf-token";
 const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
 
-const EXEMPT_PATHS = new Set(["/auth/login", "/auth/register", "/auth/forgot-password", "/auth/reset-password"]);
+const EXEMPT_PATHS = new Set(["/auth/login", "/auth/register", "/auth/forgot-password", "/auth/reset-password", "/payments/webhook"]);
 
 export function verifyCsrf(req: Request, res: Response, next: NextFunction): void {
   if (SAFE_METHODS.has(req.method) || EXEMPT_PATHS.has(req.path)) {
