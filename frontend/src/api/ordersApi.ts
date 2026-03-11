@@ -34,4 +34,7 @@ export const ordersApi = {
 
   adminUpdateStatus: (id: string, status: string) =>
     api.patch<Order>(`/orders/admin/${id}/status`, { status }).then((res) => res.data),
+
+  createPaymentIntent: (orderId: string) =>
+    api.post<{ clientSecret: string }>(`/payments/orders/${orderId}/create-intent`).then((res) => res.data),
 };
