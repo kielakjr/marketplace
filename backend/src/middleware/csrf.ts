@@ -13,7 +13,7 @@ export function verifyCsrf(req: Request, res: Response, next: NextFunction): voi
   }
 
   const cookieToken = req.cookies[env.CSRF_COOKIE_NAME];
-  const headerToken = req.headers[CSRF_HEADER];
+  const headerToken = req.get(CSRF_HEADER);
 
   if (!cookieToken || !headerToken || cookieToken !== headerToken) {
     res.status(403).json({ error: "Invalid CSRF token" });
